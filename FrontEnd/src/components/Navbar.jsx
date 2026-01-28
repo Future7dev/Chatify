@@ -1,0 +1,31 @@
+import React, { useState } from 'react';
+import { User, Send, LogOut, Search, MoreVertical } from 'lucide-react';
+import {useNavigate} from 'react-router-dom';
+
+export default function Navbar() {
+  const navigate = useNavigate();
+
+  return (
+    <nav className="navbar navbar-light bg-white border-bottom shadow-sm">
+      <div className="container-fluid px-4">
+        <span className="navbar-brand mb-0 h3 fw-bold">Welcome</span>
+        <div className="d-flex gap-3">
+          <button
+            onClick={() => navigate('/profile')}
+            className="btn btn-primary rounded-circle d-flex align-items-center justify-content-center"
+            style={{width: '40px', height: '40px'}}
+          >
+            <User size={20} />
+          </button>
+          <button
+            onClick={() => navigate('/')}
+            className="btn btn-danger d-flex align-items-center gap-2"
+          >
+            <LogOut size={18} />
+            Logout
+          </button>
+        </div>
+      </div>
+    </nav>
+  );
+};
