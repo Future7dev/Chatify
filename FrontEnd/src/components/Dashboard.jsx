@@ -4,7 +4,7 @@ import {useNavigate} from 'react-router-dom';
 import ContactsSidebar from './ContactsSidebar';
 import Navbar from './Navbar';
 import ChatArea from './ChatArea';
-export default function Dashboard() {
+export default function Dashboard({setUser}) {
   const [selectedContact, setSelectedContact] = useState(null);
 
   const contacts = [
@@ -17,7 +17,7 @@ export default function Dashboard() {
 
   return (
     <div className="vh-100 d-flex flex-column">
-      <Navbar />
+      <Navbar setUser={setUser} />
       <div className="flex-grow-1 d-flex overflow-hidden">
         <ContactsSidebar
           contacts={contacts}

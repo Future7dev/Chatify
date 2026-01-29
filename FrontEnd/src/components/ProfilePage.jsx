@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { use, useState } from 'react';
 import { User, Send, LogOut, Search, MoreVertical } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 
-export default function ProfilePage() {
+export default function ProfilePage({user}) {
+    const[name,setName]=useState(user.name);
+    const[gmail,setGmail]=useState(user.gmail);
    const navigate = useNavigate();
+   console.log(user);
 
   return (
     <div className="min-vh-100 bg-light">
@@ -36,7 +39,9 @@ export default function ProfilePage() {
                   <label className="form-label fw-semibold">Name</label>
                   <input
                     type="text"
-                    defaultValue="John Doe"
+                    
+                    value={name}
+                    onChange={(e)=>setName(e.target.value)}
                     className="form-control form-control-lg"
                   />
                 </div>
@@ -44,7 +49,8 @@ export default function ProfilePage() {
                   <label className="form-label fw-semibold">Email</label>
                   <input
                     type="email"
-                    defaultValue="john.doe@example.com"
+                    value={gmail}
+                    onChange={(e)=>setGmail(e.target.value)}
                     className="form-control form-control-lg"
                   />
                 </div>

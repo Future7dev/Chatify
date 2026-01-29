@@ -1,17 +1,38 @@
 import React, { useState } from 'react';
 import { User, Send, LogOut, Search, MoreVertical } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
+import axios from 'axios';
 
-export default function LoginPage() {
+export default function LoginPage({setUser}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate()
 
   const handleLogin = () => {
-    if (email && password) {
-      navigate('/dashboard');
-    }
-  };
+  if (!email || !password) return;
+
+  axios
+    .get("http://localhost:8080/api/login", {
+      auth: {
+        username: email,
+        password: password,
+      },
+    })
+    .then((res) => {
+      // Axios already gives parsed data
+      setUser(res.data);
+      console.log(res.data);
+
+      localStorage.setItem("user", JSON.stringify(res.data));
+      navigate("/dashboard");
+    })
+    .catch((err) => {
+      console.error("Login failed:", err.response?.status);
+      localStorage.removeItem("user");
+      alert("Invalid email or password");
+    });
+};
+
 
   return (
     <div className="min-vh-100  d-flex align-items-center justify-content-center logsign" >

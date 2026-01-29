@@ -2,8 +2,13 @@ import React, { useState } from 'react';
 import { User, Send, LogOut, Search, MoreVertical } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 
-export default function Navbar() {
+export default function Navbar({setUser}) {
   const navigate = useNavigate();
+  let handleLogout=()=>{
+    localStorage.removeItem("user");
+    setUser(null);
+    navigate("/");
+  }
 
   return (
     <nav className="navbar navbar-light bg-white border-bottom shadow-sm">
@@ -18,7 +23,7 @@ export default function Navbar() {
             <User size={20} />
           </button>
           <button
-            onClick={() => navigate('/')}
+            onClick={handleLogout}
             className="btn btn-danger d-flex align-items-center gap-2"
           >
             <LogOut size={18} />

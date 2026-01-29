@@ -2,14 +2,15 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 // import './index.css'
-import {BrowserRouter,Route,Routes, useNavigate} from 'react-router-dom'
+import {BrowserRouter,Route,Routes,Navigate, useNavigate} from 'react-router-dom'
 import LoginPage from './components/LoginPage'
 import SignupPage from './components/SignupPage'
 import Dashboard from './components/Dashboard'
 import ProfilePage from './components/ProfilePage'
 
 function App() {
-  
+ let [user,setUser]=useState(JSON.parse(localStorage.getItem("user"))); 
+
 
   return (
     <>
@@ -21,10 +22,13 @@ function App() {
       />
       <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={(user)?<Navigate to={"/dashboard"}/>:<LoginPage 
+        setUser={setUser
+        }
+        />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/dashboard" element={(user)?<Dashboard setUser={setUser}/>:<Navigate to={"/"}/>} />
+        <Route path="/profile" element={(user)?<ProfilePage user={user} />:<Navigate to={"/"}/>} />
       </Routes>
     </BrowserRouter>
     </>
