@@ -38,13 +38,13 @@ export default function ContactsSidebar({ contacts, selectedContact, onSelectCon
               </div>
               <div className="flex-grow-1" style={{minWidth: 0}}>
                 <h6 className="mb-0 fw-semibold text-truncate">{contact.name}</h6>
-                <p className="mb-0 text-muted small text-truncate">{contact.lastMessage}</p>
+                {/* <p className="mb-0 text-muted small text-truncate">{contact.lastMessage}</p> */}
               </div>
-              {contact.unread > 0 && (
+              {/* {contact.unread > 0 && (
                 <span className="badge bg-primary rounded-pill">
                   {contact.unread}
                 </span>
-              )}
+              )} */}
             </div>
           </div>
         ))}

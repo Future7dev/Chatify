@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Send, LogOut, Search, MoreVertical } from 'lucide-react';
+import { User, Send, LogOut, Search, MoreVertical,Smile } from 'lucide-react';
+import EmojiPicker from "emoji-picker-react";
 import { useNavigate } from 'react-router-dom';
 import { connectWebSocket, sendMessage, disconnectWebSocket } from "../api/webSocket";
 import axios from 'axios';
@@ -9,6 +10,8 @@ export default function ChatArea({ contact }) {
   const [messages, setMessages] = useState([]);
   const bottomRef=useRef(null);
   const [me, setMe] = useState(JSON.parse(localStorage.getItem("user")).gmail);
+
+  const [showEmoji, setShowEmoji] = useState(false);
 
   useEffect(() => {
     if (!contact) return;
@@ -44,6 +47,12 @@ export default function ChatArea({ contact }) {
       behaviour:"smooth"
     })
   },[messages])
+
+
+  const onEmojiClick = (emojiData) => {
+  setMessage(prev => prev + emojiData.emoji);
+  };
+
 
   const handleSend = () => {
     if (!message.trim()) return;
@@ -114,16 +123,26 @@ export default function ChatArea({ contact }) {
         <div ref={bottomRef}/>
       </div>
 
-      <div className="bg-white border-top p-3">
-        <div className="d-flex gap-2">
+      <div className="bg-white border-top p-3 position-relative">
+        <div className="d-flex gap-2 align-items-center">
+          
+          {/* Emoji button */}
+          <button
+            type="button"
+            className="btn btn-light"
+            onClick={() => setShowEmoji(prev => !prev)}
+          >
+            <Smile size={22} />
+          </button>
+
           <input
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
             placeholder="Type a message..."
             className="form-control form-control-lg"
           />
+
           <button
             onClick={handleSend}
             className="btn btn-primary d-flex align-items-center gap-2"
@@ -131,7 +150,15 @@ export default function ChatArea({ contact }) {
             <Send size={20} />
           </button>
         </div>
+
+        {/* Emoji Picker */}
+        {showEmoji && (
+          <div style={{ position: "absolute", bottom: "70px", left: "10px", zIndex: 1000 }}>
+            <EmojiPicker onEmojiClick={onEmojiClick} />
+          </div>
+        )}
       </div>
+
     </div>
   );
 }

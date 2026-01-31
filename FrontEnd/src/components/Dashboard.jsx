@@ -1,19 +1,45 @@
-import React, { useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { User, Send, LogOut, Search, MoreVertical } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import ContactsSidebar from './ContactsSidebar';
 import Navbar from './Navbar';
 import ChatArea from './ChatArea';
+import axios from 'axios';
+import { v4 as uuidv4 } from "uuid";
+
+
+
 export default function Dashboard({setUser}) {
   const [selectedContact, setSelectedContact] = useState(null);
 
-  const contacts = [
-    { id: 1, name: 'Nilesh',gmail:'nilesh@gmail.com', lastMessage: 'See you tomorrow!', unread: 2 },
-    { id: 2, name: 'Priyam',gmail:'koleypriyam8@gmail.com', lastMessage: 'See you tomorrow!', unread: 2 },
-    { id: 2, name: 'Ram',gmail:'ram@gmail.com', lastMessage: 'See you tomorrow!', unread: 2 }
-    
-  ];
+  const [contacts,setContacts]=useState([]);
 
+  useEffect(() => {
+  axios.get("http://localhost:8080/api/contacts", {
+    auth: {
+      username: JSON.parse(localStorage.getItem("user")).gmail,
+      password: localStorage.getItem("password")
+    }
+  })
+  .then((res) => {
+    const formattedContacts = res.data.map(con => ({
+      id: uuidv4(),   // or uuidv4()
+      name: con[0],
+      gmail: con[1]
+    }));
+
+    setContacts(formattedContacts);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+}, []);
+
+  if(!contacts){
+    return(<>
+      <div>waitt</div>
+    </>)
+  }
   return (
     <div className="vh-100 d-flex flex-column">
       <Navbar setUser={setUser} />

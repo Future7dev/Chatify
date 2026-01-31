@@ -15,9 +15,15 @@ public interface MessageRepository extends JpaRepository<MessageEntity,Long> {
            OR (m.sender = :user2 AND m.receiver = :user1)
         ORDER BY m.timeStamp
     """)
-    List<MessageEntity> findChatHistory(
+    public List<MessageEntity> findChatHistory(
             @Param("user1") String user1,
             @Param("user2") String user2
     );
+    @Query("""
+        SELECT m FROM MessageEntity m
+        WHERE (m.sender = :user OR m.receiver = :user)
+        ORDER BY m.timeStamp
+    """)
+    public List<MessageEntity>  findContacts(@Param("user") String user);
 
 }
