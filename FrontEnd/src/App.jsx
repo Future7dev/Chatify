@@ -10,6 +10,8 @@ import ProfilePage from './components/ProfilePage'
 
 function App() {
  let [user,setUser]=useState(JSON.parse(localStorage.getItem("user"))); 
+ 
+
 
 
   return (
@@ -25,6 +27,7 @@ function App() {
         <Route path="/" element={(user)?<Navigate to={"/dashboard"}/>:<LoginPage 
         setUser={setUser
         }
+        
         />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/dashboard" element={(user)?<Dashboard setUser={setUser}/>:<Navigate to={"/"}/>} />

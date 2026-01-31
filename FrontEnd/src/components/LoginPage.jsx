@@ -19,11 +19,11 @@ export default function LoginPage({setUser}) {
       },
     })
     .then((res) => {
-      // Axios already gives parsed data
       setUser(res.data);
       console.log(res.data);
 
       localStorage.setItem("user", JSON.stringify(res.data));
+      localStorage.setItem("password", password); // ✅ Store password
       navigate("/dashboard");
     })
     .catch((err) => {

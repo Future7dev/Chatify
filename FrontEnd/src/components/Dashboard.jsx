@@ -8,11 +8,10 @@ export default function Dashboard({setUser}) {
   const [selectedContact, setSelectedContact] = useState(null);
 
   const contacts = [
-    { id: 1, name: 'Alice Johnson', lastMessage: 'See you tomorrow!', unread: 2 },
-    { id: 2, name: 'Bob Smith', lastMessage: 'Thanks for the help', unread: 0 },
-    { id: 3, name: 'Charlie Brown', lastMessage: 'Let me check and get back', unread: 1 },
-    { id: 4, name: 'Diana Prince', lastMessage: 'That sounds great!', unread: 0 },
-    { id: 5, name: 'Edward Norton', lastMessage: 'Will do', unread: 5 },
+    { id: 1, name: 'Nilesh',gmail:'nilesh@gmail.com', lastMessage: 'See you tomorrow!', unread: 2 },
+    { id: 2, name: 'Priyam',gmail:'koleypriyam8@gmail.com', lastMessage: 'See you tomorrow!', unread: 2 },
+    { id: 2, name: 'Ram',gmail:'ram@gmail.com', lastMessage: 'See you tomorrow!', unread: 2 }
+    
   ];
 
   return (

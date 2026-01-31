@@ -6,6 +6,7 @@ export default function Navbar({setUser}) {
   const navigate = useNavigate();
   let handleLogout=()=>{
     localStorage.removeItem("user");
+    localStorage.removeItem("password");
     setUser(null);
     navigate("/");
   }

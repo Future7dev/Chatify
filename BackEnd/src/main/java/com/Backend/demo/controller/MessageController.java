@@ -18,10 +18,11 @@ public class MessageController {
     private MessageService messageService;
 
     @MessageMapping("/chat.send")
-    public void sendMessage(ChatMessageDTO message, Principal principal) {
-
+    public void sendMessage(ChatMessageDTO message,Principal principal) {
+        System.out.println("WS Principal: " + principal.getName());
+        System.out.println("sender :"+message.getSender()+"/n"+"recevier : "+message.getReceiver());
         MessageEntity msg = new MessageEntity(
-                principal.getName(),
+                message.getSender(),
                 message.getReceiver(),
                 message.getContent()
 

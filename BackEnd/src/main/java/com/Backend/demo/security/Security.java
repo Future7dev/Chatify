@@ -38,12 +38,12 @@ public class Security {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/ws/**"      // 🔥 IMPORTANT
+                                "/ws/**"
                         ).permitAll()
                         .requestMatchers("/api/signup").permitAll()
                         .requestMatchers("/api/login")
                         .authenticated()
-
+                        .requestMatchers("/api/message/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .httpBasic(Customizer.withDefaults());
