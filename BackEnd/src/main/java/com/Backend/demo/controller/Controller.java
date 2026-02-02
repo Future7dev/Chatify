@@ -4,6 +4,7 @@ import com.Backend.demo.entity.UserEntity;
 import com.Backend.demo.services.MessageService;
 import com.Backend.demo.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -46,4 +47,16 @@ public class Controller {
         }
         return al;
     }
+    @GetMapping("/exists")
+    public ResponseEntity<Boolean> userExist(@RequestParam String gmail){
+
+        boolean exist=userService.userExists(gmail);
+        return ResponseEntity.ok(exist);
+    }
+    @GetMapping("/user")
+    public List<String> userFinder(@RequestParam String gmail){
+        UserEntity user=userService.findByGmail(gmail).get();
+        return new ArrayList<>(Arrays.asList(user.getName(),user.getGmail()));
+    }
+
 }

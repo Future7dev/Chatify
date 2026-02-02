@@ -23,4 +23,8 @@ public class UserService {
     public Optional<UserEntity> findByGmail(String gmail){
         return userRepository.findByGmail(gmail);
     }
+    public boolean userExists(String gmail){
+        return userRepository.existsByGmail(gmail);
+    }
 }
+

@@ -13,7 +13,15 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+.addContact{
+        position: "fixed";
+        bottom: "20px";
+        right: "20px";
+        width: "55px";
+        height: "55px";
+        fontSize: "28px";
+        zIndex: 1100;
+}
 a {
   font-weight: 500;
   color: #646cff;

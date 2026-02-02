@@ -45,6 +45,8 @@ public class Security {
                         .authenticated()
                         .requestMatchers("/api/message/**").authenticated()
                         .requestMatchers("/api/contacts").authenticated()
+                        .requestMatchers("/api/exists").authenticated()
+                        .requestMatchers("/api/user").authenticated()
                         .anyRequest().permitAll()
                 )
                 .httpBasic(Customizer.withDefaults());

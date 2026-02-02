@@ -1,4 +1,4 @@
-package com.Backend.demo.webSocketConfig;
+package com.Backend.demo.Configs;
 
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.web.socket.WebSocketHandler;

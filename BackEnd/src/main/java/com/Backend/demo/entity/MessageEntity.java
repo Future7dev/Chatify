@@ -17,6 +17,7 @@ public class MessageEntity {
     @Column(length = 1000)
     private String content;
 
+    private String audioUrl;
     private LocalDateTime timeStamp;
 
 
@@ -28,7 +29,24 @@ public class MessageEntity {
         this.sender = sender;
         this.receiver = receiver;
         this.content = content;
+        this.audioUrl=null;
         this.timeStamp=LocalDateTime.now();
+    }
+
+    public MessageEntity(String sender, String receiver, String audioUrl, LocalDateTime timeStamp) {
+        this.sender = sender;
+        this.receiver = receiver;
+        this.audioUrl = audioUrl;
+        this.timeStamp = timeStamp;
+        this.content=null;
+    }
+
+    public String getAudioUrl() {
+        return audioUrl;
+    }
+
+    public void setAudioUrl(String audioUrl) {
+        this.audioUrl = audioUrl;
     }
 
     public long getId() {
