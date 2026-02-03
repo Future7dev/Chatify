@@ -22,6 +22,32 @@
         fontSize: "28px";
         zIndex: 1100;
 }
+
+
+body {
+  background-color: #F8FAFC;
+  color: #0F172A;
+}
+
+.chat-surface {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+}
+
+.chat-primary {
+  background: #6366F1 !important;
+  color: white !important;
+}
+
+.chat-primary:hover {
+  background: #4F46E5 !important;
+}
+
+.chat-muted {
+  color: #64748B;
+}
+
+
 a {
   font-weight: 500;
   color: #646cff;

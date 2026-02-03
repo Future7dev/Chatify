@@ -19,7 +19,11 @@ export default function ChatArea({ contact,setContacts,contacts }) {
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
 
-  
+  const canvasRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const analyserRef = useRef(null);
+  const animationRef = useRef(null);
+
 
   useEffect(() => {
     if (!contact) return;
@@ -65,6 +69,11 @@ export default function ChatArea({ contact,setContacts,contacts }) {
     }
     });
 
+
+
+    
+
+
     // Cleanup on unmount or contact change
     return () => {
       disconnectWebSocket();
@@ -76,6 +85,12 @@ export default function ChatArea({ contact,setContacts,contacts }) {
       behaviour:"smooth"
     })
   },[messages])
+
+  useEffect(() => {
+      if (recording && canvasRef.current && analyserRef.current) {
+        drawWaveform();
+      }
+    }, [recording]);
 
   
   const onEmojiClick = (emojiData) => {
@@ -100,17 +115,68 @@ export default function ChatArea({ contact,setContacts,contacts }) {
     setMessages(prev => [...prev, newMessage]);
     setMessage("");
   };
+  const drawWaveform = () => {
+  const canvas = canvasRef.current;
+  const analyser = analyserRef.current;
+  if (!canvas || !analyser) return;
 
-  const startRecording= async()=>{
-    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
-    mediaRecorderRef.current=new MediaRecorder(stream);
-    audioChunksRef.current=[];
-    mediaRecorderRef.current.ondataavailable=e=>{
-      audioChunksRef.current.push(e.data);
-    };
-    mediaRecorderRef.current.start();
-    setRecording(true);
-  }
+  const ctx = canvas.getContext("2d");
+  const bufferLength = analyser.frequencyBinCount; // ✅ FIX
+  const dataArray = new Uint8Array(bufferLength);
+
+  const draw = () => {
+    animationRef.current = requestAnimationFrame(draw);
+
+    analyser.getByteTimeDomainData(dataArray);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = "#0d6efd";
+    ctx.beginPath();
+
+    const sliceWidth = canvas.width / bufferLength;
+    let x = 0;
+
+    for (let i = 0; i < bufferLength; i++) {
+      const v = dataArray[i] / 128.0;
+      const y = (v * canvas.height) / 2;
+
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      x += sliceWidth;
+    }
+
+    ctx.stroke();
+  };
+
+  draw();
+};
+
+
+  const startRecording = async () => {
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+  const audioContext = new AudioContext();
+  await audioContext.resume(); // 🔥 important
+  audioContextRef.current = audioContext;
+
+  const source = audioContext.createMediaStreamSource(stream);
+  const analyser = audioContext.createAnalyser();
+  analyser.fftSize = 2048;
+
+  source.connect(analyser);
+  analyserRef.current = analyser;
+
+  mediaRecorderRef.current = new MediaRecorder(stream);
+  audioChunksRef.current = [];
+
+  mediaRecorderRef.current.ondataavailable = e => {
+    audioChunksRef.current.push(e.data);
+  };
+
+  mediaRecorderRef.current.start();
+  setRecording(true); // ⬅️ canvas renders AFTER this
+};
+
 
  const stopRecording=()=>{
     mediaRecorderRef.current.stop();
@@ -130,6 +196,10 @@ export default function ChatArea({ contact,setContacts,contacts }) {
       });
       console.log(res);
       setMessages(prev=>[...prev,res.data]);
+      cancelAnimationFrame(animationRef.current);
+      audioContextRef.current?.close();
+      mediaRecorderRef.current.stream.getTracks().forEach(t => t.stop());
+
       setRecording(false);
 
     }
@@ -184,7 +254,7 @@ export default function ChatArea({ contact,setContacts,contacts }) {
                 }`}
               >
                 {isAudio ? (
-                  // 🎙️ AUDIO → NO BUBBLE
+                   
                   <div>
                    <AudioMessage audioUrl={msg.audioUrl} isMe={msg.sender === me} />
                     <p
@@ -195,7 +265,7 @@ export default function ChatArea({ contact,setContacts,contacts }) {
                     </p>
                   </div>
                 ) : (
-                  // 💬 TEXT → NORMAL BUBBLE
+                  
                   <div
                     className={`px-3 py-2 rounded ${
                       isMe ? "bg-primary text-white" : "bg-white border"
@@ -233,13 +303,26 @@ export default function ChatArea({ contact,setContacts,contacts }) {
             <Smile size={22} />
           </button>
 
-          <input
-            type="text"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder="Type a message..."
-            className="form-control form-control-lg"
-          />
+          {recording ? (
+            <canvas
+              ref={canvasRef}
+              width={700}
+              height={40}
+              style={{
+                background: "#f1f5f9",
+                borderRadius: "8px"
+              }}
+            />
+          ) : (
+            <input
+              type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Type a message..."
+              className="form-control form-control-lg"
+            />
+          )}
+
 
           <button
             onClick={handleSend}
@@ -248,12 +331,20 @@ export default function ChatArea({ contact,setContacts,contacts }) {
             <Send size={20} />
           </button>
           <button
-            className={`btn ${recording ? "btn-danger" : "btn-primary"}`}
-             onClick={recording ? stopRecording : startRecording}
-            style={{borderRadius:"50%"}}
+            onClick={recording ? stopRecording : startRecording}
+            className="btn d-flex align-items-center justify-content-center"
+            style={{
+              width: "48px",
+              height: "48px",
+              borderRadius: "50%",
+              backgroundColor: recording ? "#dc3545" : "#0d6efd",
+              color: "white",
+              border: "none"
+            }}
           >
-           {recording?(<SquarePause />):(<Mic />)}
+            {recording ? <SquarePause size={22} /> : <Mic size={22} />}
           </button>
+
           
           
         </div>
