@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { User, Send, LogOut, Search, MoreVertical } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
+import { disconnectWebSocket } from '../api/webSocket';
 
 export default function Navbar({setUser}) {
   const navigate = useNavigate();
   let handleLogout=()=>{
+
     localStorage.removeItem("user");
     localStorage.removeItem("password");
     setUser(null);
     navigate("/");
+  
   }
 
   return (

@@ -2,7 +2,7 @@ import { Client } from "@stomp/stompjs";
 
 let stompClient = null;
 
-export const connectWebSocket = (userEmail, onMessage) => {
+export const connectWebSocket = (userEmail, onMessage,onPresence) => {
   // Disconnect existing connection if any
   if (stompClient && stompClient.connected) {
     stompClient.deactivate();
@@ -10,7 +10,9 @@ export const connectWebSocket = (userEmail, onMessage) => {
 
   stompClient = new Client({
     brokerURL: `ws://localhost:8080/ws?user=${userEmail}`,
-
+    connectHeaders: {
+    gmail: userEmail   // ✅ THIS is what Spring reads
+    },
     onConnect: () => {
       console.log("✅ WebSocket Connected for user:", userEmail);
       
@@ -18,6 +20,12 @@ export const connectWebSocket = (userEmail, onMessage) => {
         console.log("📨 Message received:", msg.body);
         onMessage(JSON.parse(msg.body));
       });
+
+      stompClient.subscribe("/topic/presence", (msg) => {
+        console.log("the presence",msg);
+        onPresence(JSON.parse(msg.body));
+      });
+
     },
 
     onStompError: (frame) => {

@@ -1,11 +1,13 @@
 import React, { use, useEffect, useState } from 'react';
-import { User, Send, LogOut, Search, MoreVertical,UserRoundPlus } from 'lucide-react';
-import {useNavigate} from 'react-router-dom';
+import { User, Send, LogOut, Search, MoreVertical,UserRoundPlus, Helicopter } from 'lucide-react';
+import {data, useNavigate} from 'react-router-dom';
 import ContactsSidebar from './ContactsSidebar';
 import Navbar from './Navbar';
 import ChatArea from './ChatArea';
 import axios from 'axios';
+import Loader from './Loader';
 import { v4 as uuidv4 } from "uuid";
+import { connectWebSocket,disconnectWebSocket } from '../api/webSocket';
 
 
 
@@ -16,10 +18,24 @@ export default function Dashboard({setUser}) {
   const [showAddContact, setShowAddContact] = useState(false);
   const [newContactName, setNewContactName] = useState("");
   const [newContactGmail, setNewContactGmail] = useState("");
-
-
+  const [loading,setLoading]=useState(false);
+  const [onlineUsers, setOnlineUsers] = useState([]);
 
   useEffect(() => {
+    connectWebSocket(JSON.parse(localStorage.getItem("user")).gmail,(msg)=>{},(presence)=>{
+      const user = Object.keys(presence)[0];
+        const isOnline = presence[user];
+
+        setOnlineUsers(prev => {
+          if (isOnline) {
+            return [...new Set([...prev, user])];
+          } else {
+            return prev.filter(u => u !== user);
+          }
+        });
+      
+    })
+  
   axios.get("http://localhost:8080/api/contacts", {
     auth: {
       username: JSON.parse(localStorage.getItem("user")).gmail,
@@ -38,6 +54,10 @@ export default function Dashboard({setUser}) {
   .catch((err) => {
     console.log(err);
   });
+
+  return ()=>{
+    disconnectWebSocket()
+  }
 }, []);
 
 
@@ -99,7 +119,7 @@ const handleNewContact=async()=>{
         zIndex: 1100
       }}
     />
-        <ChatArea contact={selectedContact} setContacts={setContacts} contacts={contacts} />
+        <ChatArea contact={selectedContact} onlineUsers={onlineUsers} setOnlineUsers={setOnlineUsers} setContacts={setContacts} contacts={contacts} setLoading={setLoading}  />
       </div>
     </div>
     {/* Floating Add Contact Button */}
@@ -171,6 +191,37 @@ const handleNewContact=async()=>{
     </div>
   </>
 )}
+
+  {loading && (
+    <>
+    <div
+      
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.3)",
+        backdropFilter: "blur(1px)",
+        zIndex: 1200
+      }}
+    />
+    <div
+    style={{
+        position: "fixed",
+        bottom: "300px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        
+        
+      
+        borderRadius: "16px",
+        padding: "20px",
+        zIndex: 1300
+      }}
+    >
+    <Loader  />
+    </div>
+    </>
+  )}
     </>
   );
 };

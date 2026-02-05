@@ -2,10 +2,12 @@ package com.Backend.demo.controller;
 
 import com.Backend.demo.entity.UserEntity;
 import com.Backend.demo.services.MessageService;
+import com.Backend.demo.services.UserPresenceService;
 import com.Backend.demo.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +20,10 @@ public class Controller {
     private UserService userService;
     @Autowired
     private MessageService messageService;
+    @Autowired
+    private UserPresenceService presenceService;
+    @Autowired
+    private SimpMessagingTemplate simpMessagingTemplate;
 
     @PostMapping("/signup")
     public ResponseEntity<?> saveUser(@RequestBody UserEntity user){
@@ -58,5 +64,10 @@ public class Controller {
         UserEntity user=userService.findByGmail(gmail).get();
         return new ArrayList<>(Arrays.asList(user.getName(),user.getGmail()));
     }
+    @GetMapping("/user/online")
+    public Set<String> onlineUser(){
+       return presenceService.getOnlineUsers();
+    }
+    
 
 }

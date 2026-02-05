@@ -8,12 +8,13 @@ import { connectWebSocket, sendMessage, disconnectWebSocket } from "../api/webSo
 import axios from 'axios';
 import AudioMessage from './AudioMessage';
 
-export default function ChatArea({ contact,setContacts,contacts }) {
+export default function ChatArea({ contact,onlineUsers,setOnlineUsers,setContacts,contacts,setLoading }) {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const bottomRef=useRef(null);
   const [me, setMe] = useState(JSON.parse(localStorage.getItem("user")).gmail);
-
+  
+  
   const [showEmoji, setShowEmoji] = useState(false);
   const [recording, setRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
@@ -24,10 +25,12 @@ export default function ChatArea({ contact,setContacts,contacts }) {
   const analyserRef = useRef(null);
   const animationRef = useRef(null);
 
+  
+
 
   useEffect(() => {
     if (!contact) return;
-
+    setLoading(true);
     // Fetch chat history
     axios
       .get(`http://localhost:8080/api/message/${contact.gmail}`, {
@@ -39,8 +42,10 @@ export default function ChatArea({ contact,setContacts,contacts }) {
       .then(res => {
         console.log("📜 Chat history loaded:", res.data);
         setMessages(res.data);
+        
       })
       .catch(err => console.error("❌ Error loading chat:", err));
+      setLoading(false);
 
     // Connect WebSocket with proper parameters
     connectWebSocket(me,async (newMessage) => {
@@ -67,7 +72,18 @@ export default function ChatArea({ contact,setContacts,contacts }) {
       }
       setContacts((prev)=>[...prev,newCon]);
     }
-    });
+    },(presence) => {
+        const user = Object.keys(presence)[0];
+        const isOnline = presence[user];
+
+        setOnlineUsers(prev => {
+          if (isOnline) {
+            return [...new Set([...prev, user])];
+          } else {
+            return prev.filter(u => u !== user);
+          }
+        });
+      });
 
 
 
@@ -79,6 +95,31 @@ export default function ChatArea({ contact,setContacts,contacts }) {
       disconnectWebSocket();
     };
   }, [contact, me]);
+
+
+
+
+  useEffect(()=>{
+
+    axios.get("http://localhost:8080/api/user/online",{
+      auth:{
+        username:JSON.parse(localStorage.getItem("user")).gmail,
+        password:localStorage.getItem("password")
+      }
+    })
+    .then(res=>{
+      console.log("online users:",res.data)
+      res.data.map(c=>setOnlineUsers(prev=>[...prev,c]));
+
+    })
+    
+    
+
+  },[])
+
+
+
+
 
   useEffect(()=>{
     bottomRef.current?.scrollIntoView({
@@ -179,6 +220,7 @@ export default function ChatArea({ contact,setContacts,contacts }) {
 
 
  const stopRecording=()=>{
+    setLoading(true);
     mediaRecorderRef.current.stop();
     mediaRecorderRef.current.onstop=async ()=>{
       const audioBlob=new Blob(audioChunksRef.current,{
@@ -201,6 +243,7 @@ export default function ChatArea({ contact,setContacts,contacts }) {
       mediaRecorderRef.current.stream.getTracks().forEach(t => t.stop());
 
       setRecording(false);
+      setLoading(false);
 
     }
  }
@@ -228,7 +271,9 @@ export default function ChatArea({ contact,setContacts,contacts }) {
           </div>
           <div>
             <h6 className="mb-0 fw-semibold">{contact.name}</h6>
-            <p className="mb-0 small text-success">Online</p>
+            {onlineUsers.includes(contact.gmail)?
+            (<p className="mb-0 small text-success">Online</p>)
+          :(<p className="mb-0 small text-muted">Offline</p>)}
           </div>
         </div>
         <button className="btn btn-light rounded-circle">
@@ -306,9 +351,11 @@ export default function ChatArea({ contact,setContacts,contacts }) {
           {recording ? (
             <canvas
               ref={canvasRef}
-              width={700}
+              
               height={40}
               style={{
+                width:"80%",
+                height:"40px",
                 background: "#f1f5f9",
                 borderRadius: "8px"
               }}

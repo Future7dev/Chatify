@@ -2,15 +2,17 @@ import React, { useState } from 'react';
 import { User, Send, LogOut, Search, MoreVertical } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
+import Loader from './Loader';
 
 export default function LoginPage({setUser}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate()
+  const[loading,setLoading]=useState(false);
 
   const handleLogin = () => {
   if (!email || !password) return;
-
+    setLoading(true);
   axios
     .get("http://localhost:8080/api/login", {
       auth: {
@@ -23,18 +25,23 @@ export default function LoginPage({setUser}) {
       console.log(res.data);
 
       localStorage.setItem("user", JSON.stringify(res.data));
-      localStorage.setItem("password", password); // ✅ Store password
+      localStorage.setItem("password", password);
+       // ✅ Store password
+      setLoading(false);
       navigate("/dashboard");
     })
     .catch((err) => {
       console.error("Login failed:", err.response?.status);
       localStorage.removeItem("user");
       alert("Invalid email or password");
+      setLoading(false);
+
     });
 };
 
 
   return (
+    <>
     <div className="min-vh-100  d-flex align-items-center justify-content-center logsign" >
       <div className="container">
         <div className="row justify-content-center">
@@ -85,6 +92,37 @@ export default function LoginPage({setUser}) {
         </div>
       </div>
     </div>
+    {loading && (
+        <>
+        <div
+          
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.3)",
+            backdropFilter: "blur(5px)",
+            zIndex: 1200
+          }}
+        />
+        <div
+        style={{
+            position: "fixed",
+            bottom: "300px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            
+            
+          
+            borderRadius: "16px",
+            padding: "20px",
+            zIndex: 1300
+          }}
+        >
+        <Loader  />
+        </div>
+        </>
+      )}
+    </>
   );
 };
 
