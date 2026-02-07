@@ -20,6 +20,7 @@ public class MessageEntity {
     private String audioUrl;
     private LocalDateTime timeStamp;
 
+    private  boolean isRead;
 
     public MessageEntity(){
 
@@ -39,6 +40,14 @@ public class MessageEntity {
         this.audioUrl = audioUrl;
         this.timeStamp = timeStamp;
         this.content=null;
+    }
+
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void setRead(boolean read) {
+        isRead = read;
     }
 
     public String getAudioUrl() {

@@ -13,16 +13,27 @@ import { connectWebSocket,disconnectWebSocket } from '../api/webSocket';
 
 export default function Dashboard({setUser}) {
   const [selectedContact, setSelectedContact] = useState(null);
-
+  const [lastMessages, setLastMessages] = useState({});
   const [contacts,setContacts]=useState([]);
   const [showAddContact, setShowAddContact] = useState(false);
   const [newContactName, setNewContactName] = useState("");
   const [newContactGmail, setNewContactGmail] = useState("");
   const [loading,setLoading]=useState(false);
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [unreadCounts, setUnreadCounts] = useState({});
+
 
   useEffect(() => {
-    connectWebSocket(JSON.parse(localStorage.getItem("user")).gmail,(msg)=>{},(presence)=>{
+    connectWebSocket(JSON.parse(localStorage.getItem("user")).gmail,(newMessage)=>{
+     setLastMessages(prev => ({
+        ...prev,
+        [newMessage.sender]: newMessage
+      }));
+      setUnreadCounts(prev => ({
+        ...prev,
+        [newMessage.sender]: (prev[newMessage.sender] || 0) + 1
+      }));
+    },(presence)=>{
       const user = Object.keys(presence)[0];
         const isOnline = presence[user];
 
@@ -34,8 +45,20 @@ export default function Dashboard({setUser}) {
           }
         });
       
-    })
+    },(typing)=>{})
   
+
+  
+    axios.get("http://localhost:8080/api/message/unread-count", {
+      auth: {
+        username: JSON.parse(localStorage.getItem("user")).gmail,
+        password: localStorage.getItem("password")
+      }
+    }).then(res => {
+      console.log("unreads:::",res.data)
+      setUnreadCounts(res.data)});
+  
+
   axios.get("http://localhost:8080/api/contacts", {
     auth: {
       username: JSON.parse(localStorage.getItem("user")).gmail,
@@ -50,15 +73,29 @@ export default function Dashboard({setUser}) {
     }));
 
     setContacts(formattedContacts);
+    axios.get("http://localhost:8080/api/message/last-messages", {
+    auth: {
+      username: JSON.parse(localStorage.getItem("user")).gmail,
+      password: localStorage.getItem("password")
+    }
+  })
+  .then(res => {
+    console.log(res.data)
+    setLastMessages(res.data)});
   })
   .catch((err) => {
     console.log(err);
   });
 
-  return ()=>{
-    disconnectWebSocket()
-  }
+
+
+  
 }, []);
+
+
+
+
+
 
 
 
@@ -105,6 +142,8 @@ const handleNewContact=async()=>{
           contacts={contacts}
           selectedContact={selectedContact}
           onSelectContact={setSelectedContact}
+          unreadCounts={unreadCounts}
+          lastMessages={lastMessages}
         />
         <UserRoundPlus 
       onClick={() => setShowAddContact(true)}
@@ -119,7 +158,15 @@ const handleNewContact=async()=>{
         zIndex: 1100
       }}
     />
-        <ChatArea contact={selectedContact} onlineUsers={onlineUsers} setOnlineUsers={setOnlineUsers} setContacts={setContacts} contacts={contacts} setLoading={setLoading}  />
+        <ChatArea contact={selectedContact} 
+        onlineUsers={onlineUsers} 
+        lastMessages={lastMessages}
+        setLastMessages={setLastMessages}
+        setOnlineUsers={setOnlineUsers} 
+        setContacts={setContacts} 
+        contacts={contacts} 
+        setLoading={setLoading}
+        setUnreadCounts={setUnreadCounts}   />
       </div>
     </div>
     {/* Floating Add Contact Button */}

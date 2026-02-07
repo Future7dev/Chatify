@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { User, Send, LogOut, Search, MoreVertical } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 
-export default function ContactsSidebar({ contacts, selectedContact, onSelectContact }) {
+export default function ContactsSidebar({ contacts, selectedContact, onSelectContact,unreadCounts,lastMessages }) {
+
+  
   return (
     <div className="bg-white border-end d-flex flex-column " style={{width: '400px', height: '100%'}}>
       <div className="p-3 border-bottom">
@@ -16,7 +18,9 @@ export default function ContactsSidebar({ contacts, selectedContact, onSelectCon
         </div>
       </div>
       <div className="flex-grow-1 overflow-auto ">
-        {contacts.map((contact) => (
+        {contacts.map((contact) => {
+          const lastMsg=lastMessages[contact?.gmail];
+          return (
           <div
             key={contact.id}
             onClick={() => onSelectContact(contact)}
@@ -38,16 +42,23 @@ export default function ContactsSidebar({ contacts, selectedContact, onSelectCon
               </div>
               <div className="flex-grow-1" style={{minWidth: 0}}>
                 <h6 className="mb-0 fw-semibold text-truncate">{contact.name}</h6>
-                {/* <p className="mb-0 text-muted small text-truncate">{contact.lastMessage}</p> */}
+                <p className="mb-0 text-muted small text-truncate">
+
+                    {lastMsg
+                      ? lastMsg.audioUrl
+                        ? "🎤 Voice message"
+                        : lastMsg.content
+                      : "No messages yet"}
+                </p>
               </div>
-              {/* {contact.unread > 0 && (
+              {unreadCounts?.[contact.gmail]>0 && (
                 <span className="badge bg-primary rounded-pill">
-                  {contact.unread}
+                  {unreadCounts[contact.gmail]}
                 </span>
-              )} */}
+              )}
             </div>
           </div>
-        ))}
+        )})}
       </div>
     </div>
   );

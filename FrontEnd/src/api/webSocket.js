@@ -2,11 +2,11 @@ import { Client } from "@stomp/stompjs";
 
 let stompClient = null;
 
-export const connectWebSocket = (userEmail, onMessage,onPresence) => {
+export const connectWebSocket = (userEmail, onMessage,onPresence,onTyping) => {
   // Disconnect existing connection if any
-  if (stompClient && stompClient.connected) {
-    stompClient.deactivate();
-  }
+  // if (stompClient && stompClient.connected) {
+  //   stompClient.deactivate();
+  // }
 
   stompClient = new Client({
     brokerURL: `ws://localhost:8080/ws?user=${userEmail}`,
@@ -25,6 +25,11 @@ export const connectWebSocket = (userEmail, onMessage,onPresence) => {
         console.log("the presence",msg);
         onPresence(JSON.parse(msg.body));
       });
+      
+      stompClient.subscribe(`/topic/typing/${userEmail}`,(msg)=>{
+        console.log(" typing :"+msg.body)
+        onTyping(JSON.parse(msg.body));
+      })
 
     },
 
@@ -50,6 +55,13 @@ export const sendMessage = (sender, receiver, content) => {
   stompClient.publish({
     destination: "/app/chat.send",
     body: JSON.stringify(message),
+  });
+};
+
+export const sendTyping = (sender, receiver) => {
+  stompClient.publish({
+    destination: "/app/chat.typing",
+    body: JSON.stringify({ sender, receiver }),
   });
 };
 

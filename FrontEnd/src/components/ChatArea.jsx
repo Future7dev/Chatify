@@ -4,17 +4,17 @@ import EmojiPicker from "emoji-picker-react";
 import { useNavigate } from 'react-router-dom';
 
 
-import { connectWebSocket, sendMessage, disconnectWebSocket } from "../api/webSocket";
+import { connectWebSocket, sendMessage, disconnectWebSocket,sendTyping } from "../api/webSocket";
 import axios from 'axios';
 import AudioMessage from './AudioMessage';
 
-export default function ChatArea({ contact,onlineUsers,setOnlineUsers,setContacts,contacts,setLoading }) {
+export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessages,setOnlineUsers,setContacts,contacts,setLoading,setUnreadCounts }) {
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([]);
+  
   const bottomRef=useRef(null);
   const [me, setMe] = useState(JSON.parse(localStorage.getItem("user")).gmail);
-  
-  
+  const [typingUser,setTypingUser]=useState(null);
+  const [messages, setMessages] = useState([]);
   const [showEmoji, setShowEmoji] = useState(false);
   const [recording, setRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
@@ -51,6 +51,8 @@ export default function ChatArea({ contact,onlineUsers,setOnlineUsers,setContact
     connectWebSocket(me,async (newMessage) => {
       console.log("📨 New message received in ChatArea:", newMessage);
       setMessages(prev => [...prev, newMessage]);
+      
+      console.log("last message :",lastMessages)
       let contactExist=contacts.some(
         c=>c.gmail===newMessage.sender
       );
@@ -83,6 +85,14 @@ export default function ChatArea({ contact,onlineUsers,setOnlineUsers,setContact
             return prev.filter(u => u !== user);
           }
         });
+      },(typing)=>{
+        if(typing.sender === contact?.gmail){
+          setTypingUser(typing.sender)
+          console.log(typing);
+          setTimeout(() => {
+              setTypingUser(null);
+            }, 2000);
+        }
       });
 
 
@@ -96,6 +106,54 @@ export default function ChatArea({ contact,onlineUsers,setOnlineUsers,setContact
     };
   }, [contact, me]);
 
+  useEffect(()=>{
+    if (!contact) return;
+  axios.put(
+    `http://localhost:8080/api/message/read/${contact.gmail}`,
+    {},
+    {
+      auth: {
+        username: me,
+        password: localStorage.getItem("password")
+      }
+    }
+  ).then(()=>{
+    axios.get("http://localhost:8080/api/message/unread-count", {
+      auth: {
+        username: JSON.parse(localStorage.getItem("user")).gmail,
+        password: localStorage.getItem("password")
+      }
+    }).then(res => {
+      console.log("unreads:::",res.data)
+      setUnreadCounts(res.data)});
+  })
+},[messages])
+
+
+  useEffect(() => {
+  if (!contact) return;
+
+  axios.put(
+    `http://localhost:8080/api/message/read/${contact.gmail}`,
+    {},
+    {
+      auth: {
+        username: me,
+        password: localStorage.getItem("password")
+      }
+    }
+  ).then(()=>{
+    axios.get("http://localhost:8080/api/message/unread-count", {
+      auth: {
+        username: JSON.parse(localStorage.getItem("user")).gmail,
+        password: localStorage.getItem("password")
+      }
+    }).then(res => {
+      console.log("unreads:::",res.data)
+      setUnreadCounts(res.data)});
+  })
+
+}, [contact]);
 
 
 
@@ -154,6 +212,7 @@ export default function ChatArea({ contact,onlineUsers,setOnlineUsers,setContact
 
     // Optimistically add to UI
     setMessages(prev => [...prev, newMessage]);
+    setLastMessages(prev=>({...prev,[contact.gmail]:newMessage}))
     setMessage("");
   };
   const drawWaveform = () => {
@@ -271,9 +330,13 @@ export default function ChatArea({ contact,onlineUsers,setOnlineUsers,setContact
           </div>
           <div>
             <h6 className="mb-0 fw-semibold">{contact.name}</h6>
-            {onlineUsers.includes(contact.gmail)?
-            (<p className="mb-0 small text-success">Online</p>)
-          :(<p className="mb-0 small text-muted">Offline</p>)}
+            {typingUser === contact.gmail ? (
+                <span style={{ color: "#0d6efd" }}>Typing...</span>
+              ) : onlineUsers.includes(contact.gmail) ? (
+                <span className="text-success">Online</span>
+              ) : (
+                <span className="text-muted">Offline</span>
+              )}
           </div>
         </div>
         <button className="btn btn-light rounded-circle">
@@ -364,7 +427,10 @@ export default function ChatArea({ contact,onlineUsers,setOnlineUsers,setContact
             <input
               type="text"
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={(e) => {
+                setMessage(e.target.value)
+                sendTyping(me,contact.gmail)
+              }}
               placeholder="Type a message..."
               className="form-control form-control-lg"
             />

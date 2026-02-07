@@ -1,11 +1,14 @@
 package com.Backend.demo.services;
 
+import com.Backend.demo.entity.MessageEntity;
 import com.Backend.demo.entity.UserEntity;
 import com.Backend.demo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -26,5 +29,7 @@ public class UserService {
     public boolean userExists(String gmail){
         return userRepository.existsByGmail(gmail);
     }
+
+
 }
 

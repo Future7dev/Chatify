@@ -5,8 +5,10 @@ import com.Backend.demo.repositories.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MessageService {
@@ -33,5 +35,28 @@ public class MessageService {
         return ans;
 
     }
+    public  void markAsRead(String sender,String receiver){
+        messageRepository.markAsRead(sender,receiver);
+    }
+    public List<Object[]> getUnreadMessages(String me){
+        return messageRepository.getUnread(me);
+    }
+
+    public Map<String , MessageEntity> getLastMessages(String me){
+        List<MessageEntity> msg=messageRepository.getLastMessages(me);
+
+        Map<String ,MessageEntity> map=new HashMap<>();
+
+        for(MessageEntity m:msg){
+            String contact=m.getSender().equals(me)?
+                    m.getReceiver():
+                    m.getSender();
+            if(!map.containsKey(contact)){
+                map.put(contact, m);
+            }
+        }
+        return map;
+    }
+
 
 }

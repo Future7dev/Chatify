@@ -1,7 +1,9 @@
 package com.Backend.demo.repositories;
 
 import com.Backend.demo.entity.MessageEntity;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -25,5 +27,32 @@ public interface MessageRepository extends JpaRepository<MessageEntity,Long> {
         ORDER BY m.timeStamp
     """)
     public List<MessageEntity>  findContacts(@Param("user") String user);
+    @Transactional
+    @Modifying
+    @Query("""
+    UPDATE MessageEntity m
+    SET m.isRead = true
+    WHERE m.sender = :sender
+    AND m.receiver = :receiver
+    AND m.isRead = false
+    """)
+    public void markAsRead(String sender,String receiver);
+
+    @Query("""
+    SELECT m.sender, COUNT(m)
+    FROM MessageEntity m
+    WHERE m.receiver = :me
+    AND m.isRead = false
+    GROUP BY m.sender
+    """)
+    public List<Object[]> getUnread(String me);
+
+    @Query("""
+    SELECT m
+    FROM MessageEntity m
+    WHERE m.receiver = :me OR m.sender = :me
+    ORDER BY m.timeStamp DESC
+    """)
+    public List<MessageEntity> getLastMessages(String me);
 
 }

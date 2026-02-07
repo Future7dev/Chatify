@@ -1,6 +1,7 @@
 package com.Backend.demo.controller;
 
 import com.Backend.demo.DTO.ChatMessageDTO;
+import com.Backend.demo.DTO.TypingDTO;
 import com.Backend.demo.entity.MessageEntity;
 import com.Backend.demo.services.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ public class MessageController {
                 message.getContent()
 
         );
+        msg.setRead(false);
 
         messageService.saveMessage(msg);
 
@@ -34,6 +36,12 @@ public class MessageController {
                 message.getReceiver(),
                 "/queue/messages",
                 msg
+        );
+    }
+    @MessageMapping("/chat.typing")
+    public void sendTyping(TypingDTO typingDTO){
+        simpMessagingTemplate.convertAndSend(
+                "/topic/typing/" + typingDTO.getReceiver(),typingDTO
         );
     }
 }

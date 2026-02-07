@@ -19,7 +19,9 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -70,6 +72,26 @@ public class RestMessageController {
         );
         return msg;
 
+    }
+    @PutMapping("/read/{sender}")
+    public void markRead(@PathVariable String sender,Principal principal){
+        messageService.markAsRead(sender, principal.getName());
+    }
+    @GetMapping("/unread-count")
+    public Map<String,Long> getUndreadMessages(Principal principal){
+        List<Object[]> l=messageService.getUnreadMessages(principal.getName());
+
+        Map<String ,Long> map=new HashMap<>();
+
+        for(Object row[]:l){
+            map.put((String)row[0],(long)row[1]);
+        }
+        return map;
+    }
+
+    @GetMapping("/last-messages")
+    public Map<String,MessageEntity> getLastMessages(Principal principal){
+        return messageService.getLastMessages(principal.getName());
     }
 
 }
