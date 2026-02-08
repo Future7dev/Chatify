@@ -4,9 +4,9 @@ let stompClient = null;
 
 export const connectWebSocket = (userEmail, onMessage,onPresence,onTyping) => {
   // Disconnect existing connection if any
-  // if (stompClient && stompClient.connected) {
-  //   stompClient.deactivate();
-  // }
+  if (stompClient && stompClient.connected) {
+    stompClient.deactivate();
+  }
 
   stompClient = new Client({
     brokerURL: `ws://localhost:8080/ws?user=${userEmail}`,

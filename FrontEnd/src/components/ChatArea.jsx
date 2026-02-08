@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Send, LogOut, Search, MoreVertical,Smile,Mic,SquarePause } from 'lucide-react';
+import { User, Send, LogOut, Search, MoreVertical,Smile,Mic,SquarePause,ImagePlus,Files } from 'lucide-react';
 import EmojiPicker from "emoji-picker-react";
 import { useNavigate } from 'react-router-dom';
 
@@ -8,13 +8,15 @@ import { connectWebSocket, sendMessage, disconnectWebSocket,sendTyping } from ".
 import axios from 'axios';
 import AudioMessage from './AudioMessage';
 
-export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessages,setOnlineUsers,setContacts,contacts,setLoading,setUnreadCounts }) {
+export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessages,setOnlineUsers,setContacts,contacts,setLoading,setUnreadCounts ,messages,setMessages,typingUser,setTypingUser}) {
   const [message, setMessage] = useState('');
-  
+  const [showAttachment, setShowAttachment] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
+
   const bottomRef=useRef(null);
   const [me, setMe] = useState(JSON.parse(localStorage.getItem("user")).gmail);
-  const [typingUser,setTypingUser]=useState(null);
-  const [messages, setMessages] = useState([]);
+  
+  
   const [showEmoji, setShowEmoji] = useState(false);
   const [recording, setRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
@@ -28,83 +30,83 @@ export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessa
   
 
 
-  useEffect(() => {
-    if (!contact) return;
-    setLoading(true);
-    // Fetch chat history
-    axios
-      .get(`http://localhost:8080/api/message/${contact.gmail}`, {
-        auth: {
-          username: JSON.parse(localStorage.getItem("user")).gmail,
-          password: localStorage.getItem("password") // Fixed: get password directly
-        }
-      })
-      .then(res => {
-        console.log("📜 Chat history loaded:", res.data);
-        setMessages(res.data);
+  // useEffect(() => {
+  //   if (!contact) return;
+  //   // setLoading(true);
+  //   // // Fetch chat history
+  //   // axios
+  //   //   .get(`http://localhost:8080/api/message/${contact.gmail}`, {
+  //   //     auth: {
+  //   //       username: JSON.parse(localStorage.getItem("user")).gmail,
+  //   //       password: localStorage.getItem("password") // Fixed: get password directly
+  //   //     }
+  //   //   })
+  //   //   .then(res => {
+  //   //     console.log("📜 Chat history loaded:", res.data);
+  //   //     setMessages(res.data);
         
-      })
-      .catch(err => console.error("❌ Error loading chat:", err));
-      setLoading(false);
+  //   //   })
+  //   //   .catch(err => console.error("❌ Error loading chat:", err));
+  //   //   setLoading(false);
 
-    // Connect WebSocket with proper parameters
-    connectWebSocket(me,async (newMessage) => {
-      console.log("📨 New message received in ChatArea:", newMessage);
-      setMessages(prev => [...prev, newMessage]);
+  //   // Connect WebSocket with proper parameters
+  //   // connectWebSocket(me,async (newMessage) => {
+  //   //   console.log("📨 New message received in ChatArea:", newMessage);
+  //   //   setMessages(prev => [...prev, newMessage]);
       
-      console.log("last message :",lastMessages)
-      let contactExist=contacts.some(
-        c=>c.gmail===newMessage.sender
-      );
+  //   //   console.log("last message :",lastMessages)
+  //   //   let contactExist=contacts.some(
+  //   //     c=>c.gmail===newMessage.sender
+  //   //   );
 
-      if(!contactExist){
-      let res=await axios.get("http://localhost:8080/api/user",{
-        params:{gmail:newMessage.sender},
-        auth: {
-          username: JSON.parse(localStorage.getItem("user")).gmail,
-          password: localStorage.getItem("password") // Fixed: get password directly
-        }
-      })
-      console.log("new contacts added: ",res.data);
-      let newCon={
-        id:crypto.randomUUID(),
-        name:res.data[0],
-        gmail:res.data[1]
+  //   //   if(!contactExist){
+  //   //   let res=await axios.get("http://localhost:8080/api/user",{
+  //   //     params:{gmail:newMessage.sender},
+  //   //     auth: {
+  //   //       username: JSON.parse(localStorage.getItem("user")).gmail,
+  //   //       password: localStorage.getItem("password") // Fixed: get password directly
+  //   //     }
+  //   //   })
+  //   //   console.log("new contacts added: ",res.data);
+  //   //   let newCon={
+  //   //     id:crypto.randomUUID(),
+  //   //     name:res.data[0],
+  //   //     gmail:res.data[1]
 
-      }
-      setContacts((prev)=>[...prev,newCon]);
-    }
-    },(presence) => {
-        const user = Object.keys(presence)[0];
-        const isOnline = presence[user];
+  //   //   }
+  //   //   setContacts((prev)=>[...prev,newCon]);
+  //   // }
+  //   // },(presence) => {
+  //   //     const user = Object.keys(presence)[0];
+  //   //     const isOnline = presence[user];
 
-        setOnlineUsers(prev => {
-          if (isOnline) {
-            return [...new Set([...prev, user])];
-          } else {
-            return prev.filter(u => u !== user);
-          }
-        });
-      },(typing)=>{
-        if(typing.sender === contact?.gmail){
-          setTypingUser(typing.sender)
-          console.log(typing);
-          setTimeout(() => {
-              setTypingUser(null);
-            }, 2000);
-        }
-      });
+  //   //     setOnlineUsers(prev => {
+  //   //       if (isOnline) {
+  //   //         return [...new Set([...prev, user])];
+  //   //       } else {
+  //   //         return prev.filter(u => u !== user);
+  //   //       }
+  //   //     });
+  //   //   },(typing)=>{
+  //   //     if(typing.sender === contact?.gmail){
+  //   //       setTypingUser(typing.sender)
+  //   //       console.log(typing);
+  //   //       setTimeout(() => {
+  //   //           setTypingUser(null);
+  //   //         }, 2000);
+  //   //     }
+  //   //   });
 
 
 
     
 
 
-    // Cleanup on unmount or contact change
-    return () => {
-      disconnectWebSocket();
-    };
-  }, [contact, me]);
+  //   // Cleanup on unmount or contact change
+  //   // return () => {
+  //   //   disconnectWebSocket();
+  //   // };
+  // }, [contact, me]);
 
   useEffect(()=>{
     if (!contact) return;
@@ -195,6 +197,39 @@ export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessa
   const onEmojiClick = (emojiData) => {
   setMessage(prev => prev + emojiData.emoji);
   };
+
+
+  const handleFileSend = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("receiver", contact.gmail);
+    setLoading(true);
+  try {
+    const res = await axios.post(
+      "http://localhost:8080/api/message/file",
+      formData,
+      {
+        auth: {
+          username: JSON.parse(localStorage.getItem("user")).gmail,
+          password: localStorage.getItem("password"),
+        },
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    setMessages(prev => [...prev, res.data]);
+    setShowAttachment(false);
+
+  } catch (err) {
+    console.error(err);
+  }
+  setLoading(false);
+};
 
 
   const handleSend = () => {
@@ -330,7 +365,7 @@ export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessa
           </div>
           <div>
             <h6 className="mb-0 fw-semibold">{contact.name}</h6>
-            {typingUser === contact.gmail ? (
+            {typingUser=== contact.gmail ? (
                 <span style={{ color: "#0d6efd" }}>Typing...</span>
               ) : onlineUsers.includes(contact.gmail) ? (
                 <span className="text-success">Online</span>
@@ -345,7 +380,7 @@ export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessa
       </div>
 
       <div className="flex-grow-1 overflow-auto p-4">
-        {messages
+       {messages
           .filter(
             msg =>
               msg.sender === contact.gmail || msg.receiver === contact.gmail
@@ -353,6 +388,8 @@ export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessa
           .map((msg, index) => {
             const isMe = msg.sender === me;
             const isAudio = !!msg.audioUrl;
+            const isImage = msg.fileType === "image";
+            const isPdf = msg.fileType === "pdf";
 
             return (
               <div
@@ -361,10 +398,14 @@ export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessa
                   isMe ? "justify-content-end" : "justify-content-start"
                 }`}
               >
+                {/* ---------------- AUDIO ---------------- */}
                 {isAudio ? (
-                   
                   <div>
-                   <AudioMessage audioUrl={msg.audioUrl} isMe={msg.sender === me} />
+                    <AudioMessage
+                      audioUrl={msg.audioUrl}
+                      isMe={isMe}
+                    />
+
                     <p
                       className="mb-0 text-muted text-end"
                       style={{ fontSize: "0.75rem" }}
@@ -372,15 +413,92 @@ export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessa
                       {new Date(msg.timeStamp).toLocaleTimeString()}
                     </p>
                   </div>
-                ) : (
-                  
+                ) : isImage ? (
+
+                  /* ---------------- IMAGE ---------------- */
+
+                  <div
+                      className={`p-2 rounded ${
+                        isMe ? "bg-primary" : "bg-white border"
+                      }`}
+                      style={{ maxWidth: "70%" }}
+                    >
+                      <img
+                        src={msg.fileUrl}
+                        alt="sent"
+                        onClick={() => setPreviewImage(msg.fileUrl)}
+                        style={{
+                          maxWidth: "200px",
+                          borderRadius: "10px",
+                          cursor: "pointer"
+                        }}
+                      />
+
+                      <p
+                        className={`mb-0 mt-1 text-end ${
+                          isMe ? "text-white-50" : "text-muted"
+                        }`}
+                        style={{ fontSize: "0.75rem" }}
+                      >
+                        {new Date(msg.timeStamp).toLocaleTimeString()}
+                      </p>
+                    </div>
+
+                ) : isPdf ? (
+
+                  /* ---------------- PDF ---------------- */
+
                   <div
                     className={`px-3 py-2 rounded ${
                       isMe ? "bg-primary text-white" : "bg-white border"
                     }`}
                     style={{ maxWidth: "70%" }}
                   >
+                    <div className="d-flex align-items-center gap-2">
+
+                      {/* PDF Icon + Name */}
+                      <span>📄 {msg.fileName}</span>
+
+                      {/* DOWNLOAD BUTTON */}
+                      <a
+                        href={msg.fileUrl}
+                        download={msg.fileName}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={`btn btn-sm ${
+                          isMe
+                            ? "btn-light"
+                            : "btn-outline-primary"
+                        }`}
+                      >
+                        Download
+                      </a>
+                    </div>
+
+                    <p
+                      className={`mb-0 mt-1 text-end ${
+                        isMe ? "text-white-50" : "text-muted"
+                      }`}
+                      style={{ fontSize: "0.75rem" }}
+                    >
+                      {new Date(msg.timeStamp).toLocaleTimeString()}
+                    </p>
+                  </div>
+
+                ) : (
+
+                  /* ---------------- TEXT ---------------- */
+
+                  <div
+                    className={`px-3 py-2 rounded ${
+                      isMe
+                        ? "bg-primary text-white"
+                        : "bg-white border"
+                    }`}
+                    style={{ maxWidth: "70%" }}
+                  >
                     <p className="mb-1">{msg.content}</p>
+
                     <p
                       className={`mb-0 ${
                         isMe ? "text-white-50" : "text-muted"
@@ -395,11 +513,41 @@ export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessa
             );
           })}
 
+
         <div ref={bottomRef} />
       </div>
 
+          
 
       <div className="bg-white border-top p-3 position-relative">
+        {showAttachment && (
+              <div className="attachment-panel">
+
+                {/* Image Input */}
+                <label className="attach-option">
+                  <ImagePlus /> Photos
+                  <input
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={handleFileSend}
+                  />
+                </label>
+                <br />
+                <br />
+                {/* PDF Input */}
+                <label className="attach-option">
+                  <Files /> Documents
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    hidden
+                     onChange={handleFileSend}
+                  />
+                </label>
+
+              </div>
+            )}
         <div className="d-flex gap-2 align-items-center">
           
           {/* Emoji button */}
@@ -409,6 +557,12 @@ export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessa
             onClick={() => setShowEmoji(prev => !prev)}
           >
             <Smile size={22} />
+          </button>
+          <button
+            className="btn btn-light"
+            onClick={() => setShowAttachment(prev => !prev)}
+          >
+            ➕
           </button>
 
           {recording ? (
@@ -471,7 +625,55 @@ export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessa
       </div>
 
     </div>
-    
+    {previewImage && (
+  <>
+    {/* Overlay */}
+    <div
+      onClick={() => setPreviewImage(null)}
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.85)",
+        backdropFilter: "blur(5px)",
+        zIndex: 2000,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "20px"
+      }}
+    >
+      {/* Image */}
+      <img
+        src={previewImage}
+        alt="preview"
+        style={{
+          maxWidth: "90%",
+          maxHeight: "90%",
+          borderRadius: "12px",
+          boxShadow: "0 0 20px rgba(0,0,0,0.5)"
+        }}
+      />
+
+      {/* Close Button */}
+      <button
+        onClick={() => setPreviewImage(null)}
+        className="btn btn-light"
+        style={{
+          position: "absolute",
+          top: "20px",
+          right: "20px",
+          fontSize: "20px",
+          borderRadius: "50%",
+          width: "45px",
+          height: "45px"
+        }}
+      >
+        ✕
+      </button>
+    </div>
+  </>
+)}
+
 
 </>
   );

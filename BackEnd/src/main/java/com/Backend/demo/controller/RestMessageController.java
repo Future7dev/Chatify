@@ -73,6 +73,67 @@ public class RestMessageController {
         return msg;
 
     }
+    @PostMapping("/file")
+    public MessageEntity uploadFile(
+            @RequestParam MultipartFile file,
+            @RequestParam String receiver,
+            Principal principal
+    ) {
+
+        String sender = principal.getName();
+
+        String originalName = file.getOriginalFilename();
+        String ext = originalName.substring(originalName.lastIndexOf("."));
+
+        String filePath = "chat-files/" + UUID.randomUUID() + ext;
+
+        byte[] bytes;
+        try {
+            bytes = file.getBytes();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        Bucket bucket = StorageClient.getInstance().bucket();
+
+        Blob blob = bucket.create(
+                filePath,
+                bytes,
+                file.getContentType()
+        );
+
+        String fileUrl = String.format(
+                "https://firebasestorage.googleapis.com/v0/b/%s/o/%s?alt=media",
+                bucket.getName(),
+                URLEncoder.encode(filePath, StandardCharsets.UTF_8)
+        );
+
+        String type = file.getContentType().startsWith("image")
+                ? "image"
+                : file.getContentType().equals("application/pdf")
+                ? "pdf"
+                : "file";
+
+        MessageEntity msg = new MessageEntity(
+                sender,
+                receiver,
+                fileUrl,
+                type,
+                originalName,
+                LocalDateTime.now()
+        );
+
+        messageService.saveMessage(msg);
+
+        messagingTemplate.convertAndSendToUser(
+                receiver,
+                "/queue/messages",
+                msg
+        );
+
+        return msg;
+    }
+
     @PutMapping("/read/{sender}")
     public void markRead(@PathVariable String sender,Principal principal){
         messageService.markAsRead(sender, principal.getName());
@@ -93,5 +154,6 @@ public class RestMessageController {
     public Map<String,MessageEntity> getLastMessages(Principal principal){
         return messageService.getLastMessages(principal.getName());
     }
+
 
 }

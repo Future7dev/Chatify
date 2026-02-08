@@ -1,4 +1,4 @@
-import React, { use, useEffect, useState } from 'react';
+import React, { use, useEffect, useRef, useState } from 'react';
 import { User, Send, LogOut, Search, MoreVertical,UserRoundPlus, Helicopter } from 'lucide-react';
 import {data, useNavigate} from 'react-router-dom';
 import ContactsSidebar from './ContactsSidebar';
@@ -21,10 +21,61 @@ export default function Dashboard({setUser}) {
   const [loading,setLoading]=useState(false);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [unreadCounts, setUnreadCounts] = useState({});
+  const [messages, setMessages] = useState([]);
+  const [typingUser,setTypingUser]=useState(null);
+  const selectedContactRef = useRef(null);
+
 
 
   useEffect(() => {
-    connectWebSocket(JSON.parse(localStorage.getItem("user")).gmail,(newMessage)=>{
+    connectWebSocket(JSON.parse(localStorage.getItem("user")).gmail,async (newMessage)=>{
+      setMessages(prev => {
+      const exist = prev.some(
+        m =>
+          m.timeStamp === newMessage.timeStamp &&
+          m.sender === newMessage.sender
+      );
+
+      if (exist) return prev;
+
+      return [...prev, newMessage];
+    });
+
+
+
+      const exist = contacts.some(
+            c => c.gmail === newMessage.sender
+          );
+
+          if (!exist) {
+            axios.get("http://localhost:8080/api/user", {
+              params: { gmail: newMessage.sender },
+              auth: {
+                username: JSON.parse(localStorage.getItem("user")).gmail,
+                password: localStorage.getItem("password")
+              }
+            }).then(res => {
+
+              const newCon = {
+                id: crypto.randomUUID(),
+                name: res.data[0],
+                gmail: res.data[1]
+              };
+
+              setContacts(prev => {
+                const already = prev.some(
+                  c => c.gmail === newCon.gmail
+                );
+                if (already) return prev;
+                return [...prev, newCon];
+              });
+
+            });
+          }
+
+
+     
+
      setLastMessages(prev => ({
         ...prev,
         [newMessage.sender]: newMessage
@@ -45,7 +96,17 @@ export default function Dashboard({setUser}) {
           }
         });
       
-    },(typing)=>{})
+    },(typing)=>{
+      console.log("sender typeing "+typing.sender+" selected "+selectedContactRef?.gmail)
+      console.log(typing.sender === selectedContactRef.current?.gmail)
+      if(typing.sender === selectedContactRef.current?.gmail){
+          setTypingUser(typing.sender)
+          console.log(typing);
+          setTimeout(() => {
+              setTypingUser(null);
+            }, 2000);
+        }
+    })
   
 
   
@@ -89,11 +150,34 @@ export default function Dashboard({setUser}) {
 
 
 
-  
+  return () => {
+    disconnectWebSocket();   // ✅ cleanup
+  };
 }, []);
 
+useEffect(() => {
+  selectedContactRef.current = selectedContact;
+}, [selectedContact]);
 
-
+useEffect(() => {
+    if (!selectedContact) return;
+    setLoading(true);
+    // Fetch chat history
+    axios
+      .get(`http://localhost:8080/api/message/${selectedContact.gmail}`, {
+        auth: {
+          username: JSON.parse(localStorage.getItem("user")).gmail,
+          password: localStorage.getItem("password") // Fixed: get password directly
+        }
+      })
+      .then(res => {
+        console.log("📜 Chat history loaded:", res.data);
+        setMessages(res.data);
+        
+      })
+      .catch(err => console.error("❌ Error loading chat:", err));
+      setLoading(false);
+},[selectedContact])
 
 
 
@@ -144,6 +228,10 @@ const handleNewContact=async()=>{
           onSelectContact={setSelectedContact}
           unreadCounts={unreadCounts}
           lastMessages={lastMessages}
+          
+          
+          
+          
         />
         <UserRoundPlus 
       onClick={() => setShowAddContact(true)}
@@ -158,15 +246,22 @@ const handleNewContact=async()=>{
         zIndex: 1100
       }}
     />
-        <ChatArea contact={selectedContact} 
-        onlineUsers={onlineUsers} 
+        <ChatArea
+        contact={selectedContact}
+        onlineUsers={onlineUsers}
         lastMessages={lastMessages}
         setLastMessages={setLastMessages}
-        setOnlineUsers={setOnlineUsers} 
-        setContacts={setContacts} 
-        contacts={contacts} 
+        setOnlineUsers={setOnlineUsers}
+        setContacts={setContacts}
+        contacts={contacts}
         setLoading={setLoading}
-        setUnreadCounts={setUnreadCounts}   />
+        setUnreadCounts={setUnreadCounts}
+        messages={messages}
+        setMessages={setMessages}
+        typingUser={typingUser}
+        setTypingUser={setTypingUser}
+      />
+
       </div>
     </div>
     {/* Floating Add Contact Button */}

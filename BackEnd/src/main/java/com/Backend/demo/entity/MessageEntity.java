@@ -22,6 +22,11 @@ public class MessageEntity {
 
     private  boolean isRead;
 
+    private String fileUrl;
+    private String fileType;
+    private String fileName;
+
+
     public MessageEntity(){
 
     }
@@ -42,8 +47,43 @@ public class MessageEntity {
         this.content=null;
     }
 
+    public MessageEntity(String sender, String receiver, String fileUrl, String fileType, String fileName, LocalDateTime timeStamp) {
+        this.sender = sender;
+        this.receiver = receiver;
+        this.fileUrl = fileUrl;
+        this.fileType = fileType;
+        this.fileName = fileName;
+        this.timeStamp = timeStamp;
+        this.content=null;
+        this.audioUrl=null;
+    }
+
     public boolean isRead() {
         return isRead;
+    }
+
+    public String getFileUrl() {
+        return fileUrl;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public void setRead(boolean read) {

@@ -47,8 +47,10 @@ export default function ContactsSidebar({ contacts, selectedContact, onSelectCon
                     {lastMsg
                       ? lastMsg.audioUrl
                         ? "🎤 Voice message"
-                        : lastMsg.content
-                      : "No messages yet"}
+                        : lastMsg.content?lastMsg.content
+                        :lastMsg.fileType==="pdf"?"pdf":"Image"
+                      : "No messages yet"
+                      }
                 </p>
               </div>
               {unreadCounts?.[contact.gmail]>0 && (
