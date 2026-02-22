@@ -76,7 +76,8 @@ public class RestMessageController {
     @PostMapping("/file")
     public MessageEntity uploadFile(
             @RequestParam MultipartFile file,
-            @RequestParam String receiver,
+            @RequestParam(required = false) long groupId,
+            @RequestParam(required = false) String receiver,
             Principal principal
     ) {
 
@@ -113,25 +114,39 @@ public class RestMessageController {
                 : file.getContentType().equals("application/pdf")
                 ? "pdf"
                 : "file";
+        if(receiver!=null && !receiver.isEmpty()){
+            MessageEntity msg = new MessageEntity(
+                    sender,
+                    receiver,
+                    fileUrl,
+                    type,
+                    originalName,
+                    LocalDateTime.now()
+            );
 
-        MessageEntity msg = new MessageEntity(
-                sender,
-                receiver,
-                fileUrl,
-                type,
-                originalName,
-                LocalDateTime.now()
-        );
+            messageService.saveMessage(msg);
 
-        messageService.saveMessage(msg);
+            messagingTemplate.convertAndSendToUser(
+                    receiver,
+                    "/queue/messages",
+                    msg
+            );
+            return msg;
 
-        messagingTemplate.convertAndSendToUser(
-                receiver,
-                "/queue/messages",
-                msg
-        );
-
-        return msg;
+        }
+        else {
+            System.out.println("group id while sending the file "+groupId);
+            MessageEntity msg=new MessageEntity();
+            msg.setFileUrl(fileUrl);
+            msg.setSender(sender);
+            msg.setGroupId(groupId);
+            msg.setFileName(originalName);
+            msg.setFileType(type);
+            msg.setTimeStamp(LocalDateTime.now());
+            messageService.saveMessage(msg);
+            messagingTemplate.convertAndSend("/topic/group/" + groupId, msg);
+            return msg;
+        }
     }
 
     @PutMapping("/read/{sender}")

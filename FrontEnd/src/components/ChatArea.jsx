@@ -216,7 +216,14 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
 
   const formData = new FormData();
   formData.append("file", file);
-  formData.append("receiver", contact.gmail);
+  if(!group){
+    
+    formData.append("receiver", contact.gmail);
+  }
+  else{
+    formData.append("groupId",group.id);
+    
+  }
     setLoading(true);
   try {
     const res = await axios.post(
@@ -233,7 +240,7 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
       }
     );
 
-    setMessages(prev => [...prev, res.data]);
+    
     setShowAttachment(false);
 
   } catch (err) {
@@ -458,6 +465,22 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
                 {/* ---------------- AUDIO ---------------- */}
                 {isAudio ? (
                   <div>
+                    {group && !isMe && (
+                      <>
+                      <p 
+                        style={{ 
+                          fontSize: "0.8rem", 
+                          fontWeight: "600",
+                          marginBottom: "4px",
+                          color: "#0d6efd"
+                        }}
+                      >
+                        {msg.sender.split('@')[0]}
+                        
+                      </p>
+                    <hr />
+                    </>
+                    )}
                     <AudioMessage
                       audioUrl={msg.audioUrl}
                       isMe={isMe}
@@ -480,6 +503,22 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
                       }`}
                       style={{ maxWidth: "70%" }}
                     >
+                      {group && !isMe && (
+                      <>
+                      <p 
+                        style={{ 
+                          fontSize: "0.8rem", 
+                          fontWeight: "600",
+                          marginBottom: "4px",
+                          color: "#0d6efd"
+                        }}
+                      >
+                        {msg.sender.split('@')[0]}
+                        
+                      </p>
+                    <hr />
+                    </>
+                    )}
                       <img
                         src={msg.fileUrl}
                         alt="sent"
@@ -511,8 +550,24 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
                     }`}
                     style={{ maxWidth: "70%" }}
                   >
+                    {group && !isMe && (
+                      <>
+                      <p 
+                        style={{ 
+                          fontSize: "0.8rem", 
+                          fontWeight: "600",
+                          marginBottom: "4px",
+                          color: "#0d6efd"
+                        }}
+                      >
+                        {msg.sender.split('@')[0]}
+                        
+                      </p>
+                    <hr />
+                    </>
+                    )}
                     <div className="d-flex align-items-center gap-2">
-
+                      
                       {/* PDF Icon + Name */}
                       <span>📄 {msg.fileName}</span>
 
