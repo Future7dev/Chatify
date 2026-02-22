@@ -55,4 +55,6 @@ public interface MessageRepository extends JpaRepository<MessageEntity,Long> {
     """)
     public List<MessageEntity> getLastMessages(String me);
 
+    public List<MessageEntity> findByGroupIdOrderByTimeStampAsc(Long groupId);
+
 }

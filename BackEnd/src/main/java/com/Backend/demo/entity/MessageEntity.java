@@ -25,7 +25,7 @@ public class MessageEntity {
     private String fileUrl;
     private String fileType;
     private String fileName;
-
+    private long groupId;
 
     public MessageEntity(){
 
@@ -37,6 +37,7 @@ public class MessageEntity {
         this.content = content;
         this.audioUrl=null;
         this.timeStamp=LocalDateTime.now();
+
     }
 
     public MessageEntity(String sender, String receiver, String audioUrl, LocalDateTime timeStamp) {
@@ -56,6 +57,14 @@ public class MessageEntity {
         this.timeStamp = timeStamp;
         this.content=null;
         this.audioUrl=null;
+    }
+
+    public long getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(long groupId) {
+        this.groupId = groupId;
     }
 
     public boolean isRead() {

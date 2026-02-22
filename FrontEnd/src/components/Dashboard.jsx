@@ -1,5 +1,5 @@
 import React, { use, useEffect, useRef, useState } from 'react';
-import { User, Send, LogOut, Search, MoreVertical,UserRoundPlus, Helicopter } from 'lucide-react';
+import { User, Send, LogOut, Search, MoreVertical,UserRoundPlus, Users } from 'lucide-react';
 import {data, useNavigate} from 'react-router-dom';
 import ContactsSidebar from './ContactsSidebar';
 import Navbar from './Navbar';
@@ -12,12 +12,26 @@ import { connectWebSocket,disconnectWebSocket } from '../api/webSocket';
 
 
 export default function Dashboard({setUser}) {
+  const [me, setMe] = useState(JSON.parse(localStorage.getItem("user")).gmail);
+  
+
+
   const [selectedContact, setSelectedContact] = useState(null);
   const [lastMessages, setLastMessages] = useState({});
   const [contacts,setContacts]=useState([]);
+
   const [showAddContact, setShowAddContact] = useState(false);
   const [newContactName, setNewContactName] = useState("");
   const [newContactGmail, setNewContactGmail] = useState("");
+
+
+  const [showCreateGroup, setShowCreateGroup] = useState(false);
+  const [groupName, setGroupName] = useState("");
+  const [memberEmail, setMemberEmail] = useState("");
+  const [groupMembers, setGroupMembers] = useState([]);
+  const [groups, setGroups] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState(null); 
+
   const [loading,setLoading]=useState(false);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [unreadCounts, setUnreadCounts] = useState({});
@@ -109,7 +123,13 @@ export default function Dashboard({setUser}) {
     })
   
 
-  
+     axios.get("http://localhost:8080/api/group", {
+    auth: {
+      username: JSON.parse(localStorage.getItem("user")).gmail,
+      password: localStorage.getItem("password")
+    }
+  }).then(res => setGroups(res.data));
+
     axios.get("http://localhost:8080/api/message/unread-count", {
       auth: {
         username: JSON.parse(localStorage.getItem("user")).gmail,
@@ -216,6 +236,57 @@ const handleNewContact=async()=>{
             setShowAddContact(false);
 
   }
+
+
+  const handleAddMember = async () => {
+    if (!memberEmail) return;
+
+    const res = await axios.get("http://localhost:8080/api/exists", {
+      params: { gmail: memberEmail },
+      auth: { username: me, password: localStorage.getItem("password") },
+    });
+
+    if (!res.data) {
+      alert("User does not exist");
+      return;
+    }
+
+    if (groupMembers.includes(memberEmail)) {
+      alert("Already added");
+      return;
+    }
+
+    setGroupMembers((prev) => [...prev, memberEmail]);
+    setMemberEmail("");
+  };
+
+  const handleCreateGroup = async () => {
+    if (!groupName || groupMembers.length === 0) {
+      alert("Enter group name & members");
+      return;
+    }
+
+    const payload = {
+      name: groupName,
+      members: [...groupMembers, me],
+    };
+
+    let res=await axios.post("http://localhost:8080/api/group/create", payload, {
+      auth: { username: me, password: localStorage.getItem("password") },
+    });
+
+    setGroups((prev)=>[...prev,res.data]);
+
+    alert("Group Created ✅");
+
+    setShowCreateGroup(false);
+    setShowAddContact(false);
+    setGroupMembers([]);
+    setGroupName("");
+  };
+
+
+
   
   return (
     <>
@@ -224,8 +295,11 @@ const handleNewContact=async()=>{
       <div className="flex-grow-1 d-flex overflow-hidden">
         <ContactsSidebar
           contacts={contacts}
+          groups={groups}                 
           selectedContact={selectedContact}
+          selectedGroup={selectedGroup}
           onSelectContact={setSelectedContact}
+          onSelectGroup={setSelectedGroup}
           unreadCounts={unreadCounts}
           lastMessages={lastMessages}
           
@@ -248,6 +322,7 @@ const handleNewContact=async()=>{
     />
         <ChatArea
         contact={selectedContact}
+        group={selectedGroup}
         onlineUsers={onlineUsers}
         lastMessages={lastMessages}
         setLastMessages={setLastMessages}
@@ -268,71 +343,158 @@ const handleNewContact=async()=>{
     
       
 
-    {showAddContact && (
-  <>
-    {/* Blur Overlay */}
-    <div
-      onClick={() => setShowAddContact(false)}
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.3)",
-        backdropFilter: "blur(5px)",
-        zIndex: 1200
-      }}
-    />
+{showAddContact && (
+          <>
+          <div
+          onClick={() => {
+          setShowAddContact(false);
+          setShowCreateGroup(false);
+          }}
+          style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,0,0,0.3)",
+          backdropFilter: "blur(5px)",
+          zIndex: 1200,
+          }}
+          />
 
-    {/* Add Contact Modal */}
-    <div
-      style={{
-        position: "fixed",
-        bottom: "300px",
-        left: "50%",
-        transform: "translateX(-50%)",
-        width: "100%",
-        maxWidth: "400px",
-        background: "white",
-        borderRadius: "16px",
-        padding: "20px",
-        zIndex: 1300
-      }}
-    >
-      <h5 className="mb-3">Add New Contact</h5>
 
-      <input
-        type="text"
-        className="form-control mb-2"
-        placeholder="Name"
-        value={newContactName}
-        onChange={(e) => setNewContactName(e.target.value)}
-      />
+          {/* PANEL */}
+          <div
+          style={{
+          position: "fixed",
+          bottom: "200px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          width: "100%",
+          maxWidth: "420px",
+          background: "white",
+          borderRadius: "16px",
+          padding: "20px",
+          zIndex: 1300,
+          }}
+          >
+          {!showCreateGroup ? (
+          <>
+          <h5>Add New Contact</h5>
 
-      <input
-        type="email"
-        className="form-control mb-3"
-        placeholder="Gmail"
-        value={newContactGmail}
-        onChange={(e) => setNewContactGmail(e.target.value)}
-      />
 
-      <div className="d-flex justify-content-end gap-2">
-        <button
+          <input
+          className="form-control mb-2"
+          placeholder="Name"
+          value={newContactName}
+          onChange={(e) => setNewContactName(e.target.value)}
+          />
+
+
+          <input
+          className="form-control mb-3"
+          placeholder="Gmail"
+          value={newContactGmail}
+          onChange={(e) => setNewContactGmail(e.target.value)}
+          />
+
+
+          <div className="d-flex justify-content-between">
+          <button
           className="btn btn-secondary"
-          onClick={handleCancelAdd}
-        >
+          onClick={() => setShowAddContact(false)}
+          >
           Cancel
-        </button>
+          </button>
 
-        <button
+
+          <button
+          className="btn btn-success"
+          onClick={() => setShowCreateGroup(true)}
+          >
+          <Users size={18} /> Create Group
+          </button>
+
+
+          <button
           className="btn btn-primary"
           onClick={handleNewContact}
-        >
+          >
           Add
-        </button>
-      </div>
-    </div>
-  </>
-)}
+          </button>
+          </div>
+          </>
+          ): (
+          <>
+          {/* -------- GROUP FORM -------- */}
+          <h5>Create Group</h5>
+
+
+          <input
+          className="form-control mb-2"
+          placeholder="Group Name"
+          value={groupName}
+          onChange={(e) => setGroupName(e.target.value)}
+          />
+
+
+          <div className="d-flex gap-2 mb-2">
+          <input
+          className="form-control"
+          placeholder="Member Gmail"
+          value={memberEmail}
+          onChange={(e) => setMemberEmail(e.target.value)}
+          />
+          <button
+          className="btn btn-primary"
+          onClick={handleAddMember}
+          >
+          Add
+          </button>
+          </div>
+
+
+          {/* MEMBERS LIST */}
+          <div style={{ maxHeight: "120px", overflowY: "auto" }}>
+          {groupMembers.map((m, i) => (
+          <div
+          key={i}
+          className="d-flex justify-content-between align-items-center border p-2 mb-1 rounded"
+          >
+          {m}
+          <button
+          className="btn btn-sm btn-danger"
+          onClick={() =>
+          setGroupMembers((prev) =>
+          prev.filter((x) => x !== m)
+          )
+          }
+          >
+          ✕
+          </button>
+          </div>
+          ))}
+          </div>
+
+
+          <div className="d-flex justify-content-end gap-2 mt-3">
+          <button
+          className="btn btn-secondary"
+          onClick={() => setShowCreateGroup(false)}
+          >
+          Back
+          </button>
+
+
+          <button
+          className="btn btn-success"
+          onClick={handleCreateGroup}
+          >
+          Create Group
+          </button>
+          </div>
+          </>
+          )}
+          </div>
+          </>
+          )}
 
   {loading && (
     <>

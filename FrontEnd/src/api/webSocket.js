@@ -43,6 +43,28 @@ export const connectWebSocket = (userEmail, onMessage,onPresence,onTyping) => {
   stompClient.activate();
 };
 
+export const subscribeToGroup = (groupId, onMessage) => {
+  if (!stompClient || !stompClient.connected) return;
+
+  stompClient.subscribe(`/topic/group/${groupId}`, (msg) => {
+    onMessage(JSON.parse(msg.body));
+  });
+};
+
+export const sendGroupMessage=(sender,groupId,content)=>{
+  if (!stompClient || !stompClient.connected) {
+    console.error("❌ WebSocket not connected!");
+    return;
+  }
+
+  const message={sender,groupId,content};
+
+  stompClient.publish({
+    destination: "/app/chat.group",
+    body: JSON.stringify(message),
+  })
+}
+
 export const sendMessage = (sender, receiver, content) => {
   if (!stompClient || !stompClient.connected) {
     console.error("❌ WebSocket not connected!");

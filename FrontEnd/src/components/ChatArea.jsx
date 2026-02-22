@@ -4,11 +4,11 @@ import EmojiPicker from "emoji-picker-react";
 import { useNavigate } from 'react-router-dom';
 
 
-import { connectWebSocket, sendMessage, disconnectWebSocket,sendTyping } from "../api/webSocket";
+import { connectWebSocket, sendMessage, disconnectWebSocket,sendTyping,sendGroupMessage,subscribeToGroup } from "../api/webSocket";
 import axios from 'axios';
 import AudioMessage from './AudioMessage';
 
-export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessages,setOnlineUsers,setContacts,contacts,setLoading,setUnreadCounts ,messages,setMessages,typingUser,setTypingUser}) {
+export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLastMessages,setOnlineUsers,setContacts,contacts,setLoading,setUnreadCounts ,messages,setMessages,typingUser,setTypingUser}) {
   const [message, setMessage] = useState('');
   const [showAttachment, setShowAttachment] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
@@ -194,6 +194,17 @@ export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessa
     }, [recording]);
 
   
+
+
+  useEffect(() => {
+  if (!group) return;
+
+  subscribeToGroup(group.id, (newMessage) => {
+    setMessages(prev => [...prev, newMessage]);
+  });
+
+}, [group]);
+
   const onEmojiClick = (emojiData) => {
   setMessage(prev => prev + emojiData.emoji);
   };
@@ -234,6 +245,21 @@ export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessa
 
   const handleSend = () => {
     if (!message.trim()) return;
+    if(group){
+      sendGroupMessage(me,group.id,message);
+      const newMessage = {
+      sender: me,
+      groupId:group.id,
+      content: message,
+      timeStamp: new Date().toISOString()
+    };
+    
+    setLastMessages(prev=>({...prev,[group.id]:newMessage}))
+    setMessage("");
+
+    }else{
+
+    
 
     const newMessage = {
       sender: me,
@@ -249,7 +275,30 @@ export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessa
     setMessages(prev => [...prev, newMessage]);
     setLastMessages(prev=>({...prev,[contact.gmail]:newMessage}))
     setMessage("");
+  }
   };
+
+
+
+  useEffect(() => {
+  if (!group) return;
+
+  setLoading(true);
+
+  axios.get(`http://localhost:8080/api/group/messages/${group.id}`, {
+    auth: {
+      username: me,
+      password: localStorage.getItem("password")
+    }
+  }).then(res => {
+    setMessages(res.data);
+  }).finally(() => {
+    setLoading(false);
+  });
+
+}, [group]);
+
+
   const drawWaveform = () => {
   const canvas = canvasRef.current;
   const analyser = analyserRef.current;
@@ -346,7 +395,7 @@ export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessa
 
 
 
-  if (!contact) {
+  if (!group &&!contact) {
     return (
       <div className="flex-1 flex items-center justify-center bg-gray-50">
         <p className="text-gray-400 text-lg">Select a contact to start chatting</p>
@@ -361,17 +410,22 @@ export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessa
         <div className="d-flex align-items-center gap-3">
           <div className="rounded-circle d-flex align-items-center justify-content-center text-white fw-semibold"
                style={{width: '40px', height: '40px', background: 'linear-gradient(135deg, #60a5fa 0%, #a855f7 100%)'}}>
-            {contact.name.charAt(0)}
+            {group ? group.name.charAt(0) : contact.name.charAt(0)}
           </div>
           <div>
-            <h6 className="mb-0 fw-semibold">{contact.name}</h6>
-            {typingUser=== contact.gmail ? (
-                <span style={{ color: "#0d6efd" }}>Typing...</span>
-              ) : onlineUsers.includes(contact.gmail) ? (
-                <span className="text-success">Online</span>
-              ) : (
-                <span className="text-muted">Offline</span>
-              )}
+            <h6 className="mb-0 fw-semibold">{group ? group.name : contact.name}</h6>
+            {group ? (
+            <span className="text-muted">
+              {/* {group.members?.length} members */}
+              Group
+            </span>
+          ) : typingUser === contact.gmail ? (
+            <span style={{ color: "#0d6efd" }}>Typing...</span>
+          ) : onlineUsers.includes(contact.gmail) ? (
+            <span className="text-success">Online</span>
+          ) : (
+            <span className="text-muted">Offline</span>
+          )}
           </div>
         </div>
         <button className="btn btn-light rounded-circle">
@@ -383,7 +437,10 @@ export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessa
        {messages
           .filter(
             msg =>
-              msg.sender === contact.gmail || msg.receiver === contact.gmail
+              (group && msg.groupId === group.id) ||
+            (!group &&
+              (msg.sender === contact.gmail ||
+              msg.receiver === contact.gmail))
           )
           .map((msg, index) => {
             const isMe = msg.sender === me;
@@ -497,6 +554,23 @@ export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessa
                     }`}
                     style={{ maxWidth: "70%" }}
                   >
+                    {group && !isMe && (
+                      <>
+                      <p 
+                        style={{ 
+                          fontSize: "0.8rem", 
+                          fontWeight: "600",
+                          marginBottom: "4px",
+                          color: "#0d6efd"
+                        }}
+                      >
+                        {msg.sender.split('@')[0]}
+                        
+                      </p>
+                    <hr />
+                    </>
+                    )}
+                    
                     <p className="mb-1">{msg.content}</p>
 
                     <p
@@ -583,7 +657,7 @@ export default function ChatArea({ contact,onlineUsers,lastMessages,setLastMessa
               value={message}
               onChange={(e) => {
                 setMessage(e.target.value)
-                sendTyping(me,contact.gmail)
+                if(contact)sendTyping(me,contact.gmail)
               }}
               placeholder="Type a message..."
               className="form-control form-control-lg"

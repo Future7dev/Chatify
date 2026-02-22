@@ -24,7 +24,9 @@ public class MessageService {
     public HashSet<String> getContacts(String user){
         List<MessageEntity> mss=messageRepository.findContacts(user);
         HashSet<String> ans=new HashSet<>();
+
         for(MessageEntity m:mss){
+            if(m.getReceiver()==null)continue;
             if(!m.getReceiver().equals(user)){
                 ans.add(m.getReceiver());
             } else if (!m.getSender().equals(user)) {
@@ -49,13 +51,17 @@ public class MessageService {
 
         for(MessageEntity m:msg){
             String contact=m.getSender().equals(me)?
-                    m.getReceiver():
+                    m.getReceiver()==null?""+m.getGroupId():m.getReceiver():
                     m.getSender();
             if(!map.containsKey(contact)){
                 map.put(contact, m);
             }
         }
         return map;
+    }
+
+    public List<MessageEntity> getGroupMessages(Long groupId){
+        return  messageRepository.findByGroupIdOrderByTimeStampAsc(groupId);
     }
 
 

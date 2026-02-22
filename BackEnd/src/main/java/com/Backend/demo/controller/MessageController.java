@@ -1,6 +1,7 @@
 package com.Backend.demo.controller;
 
 import com.Backend.demo.DTO.ChatMessageDTO;
+import com.Backend.demo.DTO.GroupMessageDTO;
 import com.Backend.demo.DTO.TypingDTO;
 import com.Backend.demo.entity.MessageEntity;
 import com.Backend.demo.services.MessageService;
@@ -43,5 +44,17 @@ public class MessageController {
         simpMessagingTemplate.convertAndSend(
                 "/topic/typing/" + typingDTO.getReceiver(),typingDTO
         );
+    }
+    @MessageMapping("/chat.group")
+    public  void sendGroupMessage(GroupMessageDTO messageDTO,Principal principal){
+        MessageEntity messageEntity=new MessageEntity();
+
+        messageEntity.setGroupId(messageDTO.getGroupId());
+        messageEntity.setSender(messageDTO.getSender());
+        messageEntity.setContent(messageDTO.getContent());
+
+        messageService.saveMessage(messageEntity);
+
+        simpMessagingTemplate.convertAndSend("/topic/group/"+messageDTO.getGroupId(),messageEntity);
     }
 }
