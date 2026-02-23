@@ -240,7 +240,7 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
       }
     );
 
-    
+    if(!group)setMessages((prev)=>[...prev,res.data]);
     setShowAttachment(false);
 
   } catch (err) {
@@ -378,7 +378,12 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
       });
       const formData=new FormData();
       formData.append("file",audioBlob);
-      formData.append("receiver",contact.gmail);
+      if(!group){
+        formData.append("receiver",contact.gmail);
+      }
+      else{
+        formData.append("groupId",group.id);
+      }
 
       let res= await axios.post("http://localhost:8080/api/message/voice",formData,{
         auth:{
@@ -387,7 +392,7 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
         },
       });
       console.log(res);
-      setMessages(prev=>[...prev,res.data]);
+      if(!group)setMessages(prev=>[...prev,res.data]);
       cancelAnimationFrame(animationRef.current);
       audioContextRef.current?.close();
       mediaRecorderRef.current.stream.getTracks().forEach(t => t.stop());

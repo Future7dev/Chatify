@@ -38,7 +38,11 @@ public class RestMessageController {
     }
 
     @PostMapping("/voice")
-    public MessageEntity setVoice(@RequestParam MultipartFile file, @RequestParam String receiver, Principal principal){
+    public MessageEntity setVoice(@RequestParam MultipartFile file,
+                                  @RequestParam(required = false) String receiver,
+                                  @RequestParam(required = false) Long groupId,
+
+                                  Principal principal){
         String  sender= principal.getName();
         String fileName="voice/"+ UUID.randomUUID()+".webm";
         byte[] fb=null;
@@ -60,23 +64,35 @@ public class RestMessageController {
                 bucket.getName(),
                 URLEncoder.encode(fileName, StandardCharsets.UTF_8)
         );
+        if(receiver!=null && !receiver.isEmpty()) {
+            MessageEntity msg = new MessageEntity(sender, receiver, audioUrl, LocalDateTime.now());
+            messageService.saveMessage(msg);
 
-        MessageEntity msg=new MessageEntity(sender,receiver,audioUrl, LocalDateTime.now());
-        messageService.saveMessage(msg);
 
+            messagingTemplate.convertAndSendToUser(
+                    receiver,
+                    "/queue/messages",
+                    msg
+            );
+            return msg;
+        }else{
+            MessageEntity msg=new MessageEntity();
+            msg.setSender(sender);
+            msg.setGroupId(groupId);
+            msg.setAudioUrl(audioUrl);
+            msg.setTimeStamp(LocalDateTime.now());
 
-        messagingTemplate.convertAndSendToUser(
-                receiver,
-                "/queue/messages",
-                msg
-        );
-        return msg;
+            messageService.saveMessage(msg);
+
+            messagingTemplate.convertAndSend("/topic/group/" + groupId, msg);
+            return  msg;
+        }
 
     }
     @PostMapping("/file")
     public MessageEntity uploadFile(
             @RequestParam MultipartFile file,
-            @RequestParam(required = false) long groupId,
+            @RequestParam(required = false) Long groupId,
             @RequestParam(required = false) String receiver,
             Principal principal
     ) {
