@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { User, Send, LogOut, Search, MoreVertical,Smile,Mic,SquarePause,ImagePlus,Files } from 'lucide-react';
 import EmojiPicker from "emoji-picker-react";
 import { useNavigate } from 'react-router-dom';
+import Particles from './Particles';
 
 
 import { connectWebSocket, sendMessage, disconnectWebSocket,sendTyping,sendGroupMessage,subscribeToGroup } from "../api/webSocket";
@@ -417,7 +418,8 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
 
   return (
     <>
-    <div className="flex-grow-1 d-flex flex-column bg-light" style={{marginLeft:"-55px"}}>
+    <div className="flex-grow-1 d-flex flex-column " style={{backgroundColor:'#13122c',
+      marginLeft:"-55px"}}>
       <div className="bg-white border-bottom p-3 d-flex align-items-center justify-content-between">
         <div className="d-flex align-items-center gap-3">
           <div className="rounded-circle d-flex align-items-center justify-content-center text-white fw-semibold"
@@ -444,8 +446,36 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
           <MoreVertical size={20} />
         </button>
       </div>
+      
 
-      <div className="flex-grow-1 overflow-auto p-4">
+      <div
+          className="flex-grow-1 overflow-auto p-4"
+          style={{ position: "relative" }}
+        >
+                {/* Particles Background */}
+          <div
+            style={{
+              position: "fixed",   // 🔥 change from absolute → fixed
+              
+              width: "80%",
+              height: "100%",
+              zIndex: 0,
+              
+            }}
+          >
+            <Particles
+              particleColors={["#ffffff"]}
+              particleCount={900}
+              particleSpread={20}
+              speed={0.1}
+              particleBaseSize={100}
+              moveParticlesOnHover
+              alphaParticles={false}
+              disableRotation={false}
+              pixelRatio={1}
+            />
+          </div>
+      <div style={{ position: "relative", zIndex: 1 }}>
        {messages
           .filter(
             msg =>
@@ -647,7 +677,7 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
             );
           })}
 
-
+          </div>
         <div ref={bottomRef} />
       </div>
 
