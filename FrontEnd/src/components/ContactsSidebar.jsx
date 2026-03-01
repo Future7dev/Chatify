@@ -26,23 +26,18 @@ export default function ContactsSidebar({ contacts,groups, selectedContact,selec
 
         {groups?.map(group => (
           <div
-            key={group.id}
-            onClick={() => {
-              onSelectGroup(group);
-              onSelectContact(null);
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
-            onMouseLeave={(e) => {
-              if (selectedGroup?.id !== group.id) {
-                e.currentTarget.style.backgroundColor = 'white';
-              }
-            }}
-            className={`p-3 border-bottom cursor-pointer ${
-              selectedGroup?.id === group.id
-                ? "bg-primary bg-opacity-10"
-                : ""
-            }`}
-          >
+              key={group.id}
+              onClick={() => {
+                onSelectGroup(group);
+                onSelectContact(null);
+              }}
+              className={`p-3 border-bottom cursor-pointer ${
+                selectedGroup?.id === group.id
+                  ? "bg-primary bg-opacity-25"
+                  : "contact-item"
+              }`}
+              style={{ cursor: "pointer" }}
+            >
             <div className="d-flex align-items-center gap-3">
               <div
                 className="rounded-circle d-flex align-items-center justify-content-center text-white fw-semibold"

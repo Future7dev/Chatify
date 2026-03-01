@@ -410,17 +410,59 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
 
   if (!group &&!contact) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-gray-50">
-        <p className="text-gray-400 text-lg">Select a contact to start chatting</p>
+      <>
+      <div
+      style={{
+        position:'relative',
+        backgroundColor:'#29013c',
+        width:'78%',
+        marginLeft:'-52px'
+        
+      }}
+      >
+      <div
+            style={{
+              position: "fixed",   // 🔥 change from absolute → fixed
+              
+              width: "100%",
+              height: "100%",
+              zIndex: 0,
+              
+              
+            }}
+          >
+            <Particles
+              particleColors={["#ffffff"]}
+              particleCount={900}
+              particleSpread={20}
+              speed={0.1}
+              particleBaseSize={100}
+              moveParticlesOnHover
+              alphaParticles={false}
+              disableRotation={false}
+              pixelRatio={1}
+            />
+          </div>
+      <div className="flex-1 flex items-center justify-center bg-gray-50"
+      style={{marginTop:'300px',
+        marginLeft:'425px',
+        fontSize:'large'
+      }}
+      >
+        <p className="text-white text-lg">Select a contact to start chatting</p>
       </div>
+      </div>
+      </>
     );
   }
 
   return (
     <>
-    <div className="flex-grow-1 d-flex flex-column " style={{backgroundColor:'#13122c',
+    <div className="flex-grow-1 d-flex flex-column " style={{backgroundColor:'#29013c',
       marginLeft:"-55px"}}>
-      <div className="bg-white border-bottom p-3 d-flex align-items-center justify-content-between">
+      <div className=" border-bottom p-3 d-flex align-items-center justify-content-between"
+      style={{backgroundColor:'#f5cbff'}}
+      >
         <div className="d-flex align-items-center gap-3">
           <div className="rounded-circle d-flex align-items-center justify-content-center text-white fw-semibold"
                style={{width: '40px', height: '40px', background: 'linear-gradient(135deg, #60a5fa 0%, #a855f7 100%)'}}>
@@ -469,7 +511,7 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
               particleSpread={20}
               speed={0.1}
               particleBaseSize={100}
-              moveParticlesOnHover
+              
               alphaParticles={false}
               disableRotation={false}
               pixelRatio={1}
@@ -683,7 +725,9 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
 
           
 
-      <div className="bg-white border-top p-3 position-relative">
+      <div className=" border-top p-3 position-relative"
+      style={{backgroundColor:'#f5cbff'}}
+      >
         {showAttachment && (
               <div className="attachment-panel">
 

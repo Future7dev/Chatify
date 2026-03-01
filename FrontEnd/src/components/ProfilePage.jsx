@@ -9,8 +9,13 @@ export default function ProfilePage({user}) {
    console.log(user);
 
   return (
-    <div className="min-vh-100 bg-light">
-      <div className="bg-white border-bottom p-3">
+    <div className="min-vh-100 "
+    style={{backgroundColor:'#3b0449'}}
+    
+    >
+      <div className=" border-bottom p-3"
+      style={{backgroundColor:'#f5cbff'}}
+      >
         <button
           onClick={() => navigate('/dashboard')}
           className="btn btn-link text-decoration-none fw-semibold"
