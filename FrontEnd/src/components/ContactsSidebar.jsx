@@ -2,11 +2,15 @@ import React, { useState } from 'react';
 import { User, Send, LogOut, Search, MoreVertical } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 
+
 export default function ContactsSidebar({ contacts,groups, selectedContact,selectedGroup, onSelectContact,onSelectGroup,unreadCounts,lastMessages }) {
 
   
   return (
-    <div className="bg-white border-end d-flex flex-column " style={{width: '400px', height: '100%'}}>
+    <div className=" border-end d-flex flex-column " style={{width: '400px',
+      backgroundColor:'#2f033a',
+      color:'white',
+     height: '100%'}}>
       <div className="p-3 border-bottom">
         <div className="position-relative">
           <Search className="position-absolute text-muted" size={20} style={{left: '12px', top: '10px'}} />
@@ -64,30 +68,32 @@ export default function ContactsSidebar({ contacts,groups, selectedContact,selec
           const lastMsg=lastMessages[contact?.gmail];
           return (
           <div
-            key={contact.id}
-            onClick={() => {
-              onSelectContact(contact)
-              onSelectGroup(null);
-            }}
-            className={`p-3 border-bottom cursor-pointer ${
-              selectedContact?.id === contact.id ? 'bg-primary bg-opacity-10' : ''
-            }`}
-            style={{cursor: 'pointer'}}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8f9fa'}
-            onMouseLeave={(e) => {
-              if (selectedContact?.id !== contact.id) {
-                e.currentTarget.style.backgroundColor = 'white';
-              }
-            }}
-          >
+              key={contact.id}
+              onClick={() => {
+                onSelectContact(contact);
+                onSelectGroup(null);
+              }}
+              className={`p-3 border-bottom cursor-pointer ${
+                selectedContact?.id === contact.id
+                  ? "bg-primary bg-opacity-25"
+                  : "contact-item"
+              }`}
+              style={{ cursor: "pointer" }}
+            >
             <div className="d-flex align-items-center gap-3">
               <div className="rounded-circle d-flex align-items-center justify-content-center text-white fw-semibold" 
                    style={{width: '48px', height: '48px', background: 'linear-gradient(135deg, #60a5fa 0%, #a855f7 100%)'}}>
                 {contact.name.charAt(0)}
               </div>
-              <div className="flex-grow-1" style={{minWidth: 0}}>
+              <div className="flex-grow-1" style={{
+                color:'white',
+                minWidth: 0}}>
                 <h6 className="mb-0 fw-semibold text-truncate">{contact.name}</h6>
-                <p className="mb-0 text-muted small text-truncate">
+                <p className="mb-0 small text-truncate"
+                style={{
+                color:'white'
+                }}
+                >
 
                     {lastMsg
                       ? lastMsg.audioUrl

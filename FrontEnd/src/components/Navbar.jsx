@@ -15,9 +15,16 @@ export default function Navbar({setUser}) {
   }
 
   return (
-    <nav className="navbar navbar-light bg-white border-bottom shadow-sm">
+    <nav className="navbar navbar-light  border-bottom shadow-sm "
+    style={{backgroundColor:'#560964',
+      color:'white'
+    }}
+    >
       <div className="container-fluid px-4">
-        <span className="navbar-brand mb-0 h3 fw-bold">Welcome</span>
+        <span 
+        className="navbar-brand mb-0 h3 fw-bold"
+        
+        >Welcome</span>
         <div className="d-flex gap-3">
           <button
             onClick={() => navigate('/profile')}

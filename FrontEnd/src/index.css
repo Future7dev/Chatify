@@ -114,4 +114,12 @@ button:focus-visible {
   }
 }
 
+.contact-item {
+  color: white;
+  background-color: #3b0548;
+  transition: background-color 0.2s ease;
+}
 
+.contact-item:hover {
+  background-color: #5b5186;
+}
