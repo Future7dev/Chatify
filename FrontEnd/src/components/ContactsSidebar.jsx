@@ -24,7 +24,9 @@ export default function ContactsSidebar({ contacts,groups, selectedContact,selec
       <div className="flex-grow-1 overflow-auto ">
         <div className="p-2 text-muted fw-bold">Groups</div>
 
-        {groups?.map(group => (
+        {groups?.map(group => {
+          const lastMsg=lastMessages[""+group.id];
+          return (
           <div
               key={group.id}
               onClick={() => {
@@ -52,13 +54,27 @@ export default function ContactsSidebar({ contacts,groups, selectedContact,selec
 
               <div>
                 <h6 className="mb-0">{group.name}</h6>
+                 <p className="mb-0 small text-truncate"
+                style={{
+                color:'white'
+                }}
+                >
+
+                    {lastMsg
+                      ? lastMsg.audioUrl
+                        ? "🎤 Voice message"
+                        : lastMsg.content?lastMsg.content
+                        :lastMsg.fileType==="pdf"?"pdf":"Image"
+                      : "No messages yet"
+                      }
+                </p>
                 {/* <small className="text-muted">
                   {group.members?.length} members
                 </small> */}
               </div>
             </div>
           </div>
-        ))}
+        )})}
         {contacts.map((contact) => {
           const lastMsg=lastMessages[contact?.gmail];
           return (
