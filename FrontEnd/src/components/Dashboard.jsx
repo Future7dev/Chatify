@@ -73,7 +73,8 @@ export default function Dashboard({setUser}) {
               const newCon = {
                 id: crypto.randomUUID(),
                 name: res.data[0],
-                gmail: res.data[1]
+                gmail: res.data[1],
+                url:res.data[2]
               };
 
               setContacts(prev => {
@@ -150,7 +151,8 @@ export default function Dashboard({setUser}) {
     const formattedContacts = res.data.map(con => ({
       id: uuidv4(),   // or uuidv4()
       name: con[0],
-      gmail: con[1]
+      gmail: con[1],
+      url:con[2]
     }));
 
     setContacts(formattedContacts);

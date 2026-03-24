@@ -50,6 +50,7 @@ public class Security {
                         .requestMatchers("/api/user/online").authenticated()
                         .requestMatchers("/api/user/online").authenticated()
                         .requestMatchers("/api/group/**").authenticated()
+                        .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .httpBasic(Customizer.withDefaults());

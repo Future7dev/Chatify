@@ -466,7 +466,20 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
         <div className="d-flex align-items-center gap-3">
           <div className="rounded-circle d-flex align-items-center justify-content-center text-white fw-semibold"
                style={{width: '40px', height: '40px', background: 'linear-gradient(135deg, #60a5fa 0%, #a855f7 100%)'}}>
-            {group ? group.name.charAt(0) : contact.name.charAt(0)}
+            {group ? group.name.charAt(0) : contact.url ? (
+                    <img
+                      src={contact.url}
+                      alt=""
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        borderRadius:"50%"
+                      }}
+                    />
+                  ) : (
+                    contact.name?.charAt(0)
+                  )}
           </div>
           <div>
             <h6 className="mb-0 fw-semibold">{group ? group.name : contact.name}</h6>

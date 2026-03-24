@@ -11,7 +11,7 @@ public class UserEntity {
     private long id;
 
     private String name;
-
+    private String imgUrl;
     @Column(unique = true)
     private String gmail;
 
@@ -25,6 +25,14 @@ public class UserEntity {
         this.name = name;
         this.gmail = gmail;
         this.password = password;
+    }
+
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
     }
 
     public long getId() {

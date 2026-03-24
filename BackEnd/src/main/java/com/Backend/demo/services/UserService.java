@@ -22,6 +22,9 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
+    public UserEntity saveUpdatedUser(UserEntity user){
+        return userRepository.save(user);
+    }
 
     public Optional<UserEntity> findByGmail(String gmail){
         return userRepository.findByGmail(gmail);

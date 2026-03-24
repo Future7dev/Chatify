@@ -184,9 +184,7 @@ public class RestMessageController {
     @GetMapping("/last-messages")
     public Map<String,MessageEntity> getLastMessages(Principal principal){
             Map<String,MessageEntity> map=messageService.getLastMessages(principal.getName());
-            for(Map.Entry<String ,MessageEntity> en:map.entrySet()){
-                System.out.println(en.getKey());
-            }
+
         return map;
     }
 
