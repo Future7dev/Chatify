@@ -7,6 +7,7 @@ import LoginPage from './components/LoginPage'
 import SignupPage from './components/SignupPage'
 import Dashboard from './components/Dashboard'
 import ProfilePage from './components/ProfilePage'
+import LandingPage from './components/LandingPage'
 
 function App() {
  let [user,setUser]=useState(JSON.parse(localStorage.getItem("user"))); 
@@ -24,11 +25,8 @@ function App() {
       />
       <BrowserRouter>
       <Routes>
-        <Route path="/" element={(user)?<Navigate to={"/dashboard"}/>:<LoginPage 
-        setUser={setUser
-        }
-        
-        />} />
+       <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage setUser={setUser} />} />
+        <Route path="/landing" element={<LandingPage setUser={setUser} />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/dashboard" element={(user)?<Dashboard setUser={setUser}/>:<Navigate to={"/"}/>} />
         <Route path="/profile" element={(user)?<ProfilePage user={user} />:<Navigate to={"/"}/>} />
