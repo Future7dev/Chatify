@@ -595,14 +595,14 @@ export default function LandingPage({ setUser }) {
       <div className="lp-root">
         {/* NAV */}
         <nav className="lp-nav">
-          <div className="lp-logo">Aura<span>.</span>Chat</div>
+          <div className="lp-logo">Chatify</div>
           <ul className="lp-nav-links">
             <li><a href="#features">Features</a></li>
             <li><a href="#preview">Preview</a></li>
             <li><a href="#about">About</a></li>
           </ul>
           <div className="lp-nav-cta">
-            <button className="btn-ghost" onClick={() => navigate("/")}>Log in</button>
+            <button className="btn-ghost" onClick={() => navigate("/login")}>Log in</button>
             <button className="btn-primary" onClick={() => navigate("/signup")}>Sign up</button>
           </div>
         </nav>
@@ -640,7 +640,7 @@ export default function LandingPage({ setUser }) {
               <button className="btn-hero" onClick={() => navigate("/signup")}>
                 Start for free
               </button>
-              <button className="btn-hero-ghost" onClick={() => navigate("/")}>
+              <button className="btn-hero-ghost" onClick={() => navigate("/login")}>
                 Sign in →
               </button>
             </div>
@@ -669,7 +669,7 @@ export default function LandingPage({ setUser }) {
 
         {/* FEATURES */}
         <section className="lp-features" id="features">
-          <div className="lp-section-label">Why Aura</div>
+          <div className="lp-section-label">Why Chatify</div>
           <h2 className="lp-section-title">
             Every detail<br />considered.
           </h2>
@@ -736,8 +736,8 @@ export default function LandingPage({ setUser }) {
 
         {/* FOOTER */}
         <footer className="lp-footer">
-          <div className="lp-footer-logo">Aura<span>.</span>Chat</div>
-          <div className="lp-footer-copy">© 2026 AuraChat. All rights reserved.</div>
+          <div className="lp-footer-logo">Chatify</div>
+          <div className="lp-footer-copy">© 2026 Chatify. All rights reserved.</div>
         </footer>
       </div>
     </>

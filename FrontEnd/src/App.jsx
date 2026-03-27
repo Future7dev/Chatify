@@ -28,8 +28,10 @@ function App() {
        <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage setUser={setUser} />} />
         <Route path="/landing" element={<LandingPage setUser={setUser} />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="/dashboard" element={(user)?<Dashboard setUser={setUser}/>:<Navigate to={"/"}/>} />
-        <Route path="/profile" element={(user)?<ProfilePage user={user} />:<Navigate to={"/"}/>} />
+        <Route path="/login" element={<LoginPage setUser={setUser} />} />
+
+        <Route path="/dashboard" element={(user)?<Dashboard setUser={setUser}/>:<Navigate to={"/login"}/>} />
+        <Route path="/profile" element={(user)?<ProfilePage user={user} />:<Navigate to={"/login"}/>} />
       </Routes>
     </BrowserRouter>
     </>
