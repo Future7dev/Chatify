@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import SoftAurora from "./SoftAurora";
+import { useEffect, useRef } from "react";
 
 
 /* ─── Animated Counter ───────────────────────────────────────────── */
