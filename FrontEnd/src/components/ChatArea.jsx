@@ -230,11 +230,10 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
       `${import.meta.env.VITE_API_URL}/api/message/file`,
       formData,
       {
-         headers: {
-    Authorization: `Basic ${token}`
-  },
+         
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: `Basic ${token}`
         },
       }
     );
