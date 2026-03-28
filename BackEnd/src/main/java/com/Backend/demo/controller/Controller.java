@@ -121,7 +121,7 @@ public class Controller {
 
         user.setName(data.get("name"));
 
-        userService.saveUser(user);
+        userService.saveUpdatedUser(user);
         return ResponseEntity.ok(user);
 
     }

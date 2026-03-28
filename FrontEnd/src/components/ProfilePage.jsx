@@ -9,6 +9,24 @@ export default function ProfilePage({user}) {
     const[url,setUrl]=useState(user.url)
    const navigate = useNavigate();
    console.log(user);
+   const handleUpdate = async () => {
+    try {
+      const res = await axios.put("http://localhost:8080/api/update", {
+        name,
+        
+      }, {
+        auth: {
+          username: JSON.parse(localStorage.getItem("user")).gmail,
+          password: localStorage.getItem("password"),
+        },
+      });
+      console.log(res.data);
+      alert("Profile updated successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update profile.");
+    }
+  };
 
   const handleFileSend = async (e) => {
   const file = e.target.files[0];
@@ -118,11 +136,12 @@ export default function ProfilePage({user}) {
                   <input
                     type="email"
                     value={gmail}
-                    onChange={(e)=>setGmail(e.target.value)}
+                    readOnly
                     className="form-control form-control-lg"
                   />
                 </div>
-                <button className="btn btn-primary btn-lg w-100 fw-semibold">
+                <button className="btn btn-primary btn-lg w-100 fw-semibold"
+                onClick={handleUpdate}>
                   Save Changes
                 </button>
               </div>
