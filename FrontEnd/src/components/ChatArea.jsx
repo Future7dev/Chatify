@@ -16,7 +16,11 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
 
   const bottomRef=useRef(null);
   const [me, setMe] = useState(JSON.parse(localStorage.getItem("user")).gmail);
-  
+   
+  const authuser = JSON.parse(localStorage.getItem("user"));
+  const password = localStorage.getItem("password");
+
+  const token = btoa(`${authuser.gmail}:${password}`);
   
   const [showEmoji, setShowEmoji] = useState(false);
   const [recording, setRecording] = useState(false);
