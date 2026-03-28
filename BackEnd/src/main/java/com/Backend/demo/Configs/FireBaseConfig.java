@@ -14,7 +14,8 @@ import java.io.InputStream;
 public class FireBaseConfig {
     @PostConstruct
     public void init() throws IOException{
-        InputStream serviceAccount= new ClassPathResource("firebase-service-account.json").getInputStream();
+        String firebaseConfig = System.getenv("FIREBASE_CONFIG");
+        InputStream serviceAccount= new ClassPathResource(firebaseConfig).getInputStream();
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                 .setStorageBucket("chat-app-7739a.firebasestorage.app")
