@@ -17,7 +17,7 @@ public class CrossOrigin {
         // ✅ Allow your frontend domain
         config.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
-                "https://chatify-qzn6m15ky-future7devs-projects.vercel.app"
+                "https://chatify-nu-three.vercel.app"
         ));
 
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
