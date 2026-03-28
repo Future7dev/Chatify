@@ -16,7 +16,7 @@ export default function LoginPage({ setUser }) {
     if (!email || !password) return;
     setLoading(true);
     axios
-      .get("http://localhost:8080/api/login", {
+      .get(`${import.meta.env.VITE_API_URL}/api/login`, {
         auth: { username: email, password: password },
       })
       .then((res) => {

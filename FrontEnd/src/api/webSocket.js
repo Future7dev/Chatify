@@ -1,6 +1,7 @@
 import { Client } from "@stomp/stompjs";
 
 let stompClient = null;
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 export const connectWebSocket = (userEmail, onMessage,onPresence,onTyping) => {
   // Disconnect existing connection if any
@@ -9,7 +10,7 @@ export const connectWebSocket = (userEmail, onMessage,onPresence,onTyping) => {
   }
 
   stompClient = new Client({
-    brokerURL: `ws://localhost:8080/ws?user=${userEmail}`,
+     brokerURL: `${BASE_URL.replace("https", "wss")}/ws?user=${userEmail}`,
     connectHeaders: {
     gmail: userEmail   // ✅ THIS is what Spring reads
     },

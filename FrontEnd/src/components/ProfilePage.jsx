@@ -11,7 +11,7 @@ export default function ProfilePage({user}) {
    console.log(user);
    const handleUpdate = async () => {
     try {
-      const res = await axios.put("http://localhost:8080/api/update", {
+      const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/update`, {
         name,
         
       }, {
@@ -38,7 +38,7 @@ export default function ProfilePage({user}) {
     // setLoading(true);
   try {
     const res = await axios.post(
-      "http://localhost:8080/api/profile/image",
+      `${import.meta.env.VITE_API_URL}/api/profile/image`,
       formData,
       {
         auth: {

@@ -112,7 +112,7 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
   useEffect(()=>{
     if (!contact) return;
   axios.put(
-    `http://localhost:8080/api/message/read/${contact.gmail}`,
+    `${import.meta.env.VITE_API_URL}/api/message/read/${contact.gmail}`,
     {},
     {
       auth: {
@@ -121,7 +121,7 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
       }
     }
   ).then(()=>{
-    axios.get("http://localhost:8080/api/message/unread-count", {
+    axios.get(`${import.meta.env.VITE_API_URL}/api/message/unread-count`, {
       auth: {
         username: JSON.parse(localStorage.getItem("user")).gmail,
         password: localStorage.getItem("password")
@@ -137,7 +137,7 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
   if (!contact) return;
 
   axios.put(
-    `http://localhost:8080/api/message/read/${contact.gmail}`,
+    `${import.meta.env.VITE_API_URL}/api/message/read/${contact.gmail}`,
     {},
     {
       auth: {
@@ -146,7 +146,7 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
       }
     }
   ).then(()=>{
-    axios.get("http://localhost:8080/api/message/unread-count", {
+    axios.get(`${import.meta.env.VITE_API_URL}/api/message/unread-count`, {
       auth: {
         username: JSON.parse(localStorage.getItem("user")).gmail,
         password: localStorage.getItem("password")
@@ -162,7 +162,7 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
 
   useEffect(()=>{
 
-    axios.get("http://localhost:8080/api/user/online",{
+    axios.get(`${import.meta.env.VITE_API_URL}/api/user/online`,{
       auth:{
         username:JSON.parse(localStorage.getItem("user")).gmail,
         password:localStorage.getItem("password")
@@ -228,7 +228,7 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
     setLoading(true);
   try {
     const res = await axios.post(
-      "http://localhost:8080/api/message/file",
+      `${import.meta.env.VITE_API_URL}/api/message/file`,
       formData,
       {
         auth: {
@@ -293,7 +293,7 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
 
   setLoading(true);
 
-  axios.get(`http://localhost:8080/api/group/messages/${group.id}`, {
+  axios.get(`${import.meta.env.VITE_API_URL}/api/group/messages/${group.id}`, {
     auth: {
       username: me,
       password: localStorage.getItem("password")
@@ -386,7 +386,7 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
         formData.append("groupId",group.id);
       }
 
-      let res= await axios.post("http://localhost:8080/api/message/voice",formData,{
+      let res= await axios.post(`${import.meta.env.VITE_API_URL}/api/message/voice`,formData,{
         auth:{
           username:me,
           password: localStorage.getItem("password")

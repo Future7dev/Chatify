@@ -62,7 +62,7 @@ export default function Dashboard({setUser}) {
           );
 
           if (!exist) {
-            axios.get("http://localhost:8080/api/user", {
+            axios.get(`${import.meta.env.VITE_API_URL}/api/user`, {
               params: { gmail: newMessage.sender },
               auth: {
                 username: JSON.parse(localStorage.getItem("user")).gmail,
@@ -124,14 +124,14 @@ export default function Dashboard({setUser}) {
     })
   
 
-     axios.get("http://localhost:8080/api/group", {
+     axios.get(`${import.meta.env.VITE_API_URL}/api/group`, {
     auth: {
       username: JSON.parse(localStorage.getItem("user")).gmail,
       password: localStorage.getItem("password")
     }
   }).then(res => setGroups(res.data));
 
-    axios.get("http://localhost:8080/api/message/unread-count", {
+    axios.get(`${import.meta.env.VITE_API_URL}/api/message/unread-count`, {
       auth: {
         username: JSON.parse(localStorage.getItem("user")).gmail,
         password: localStorage.getItem("password")
@@ -141,7 +141,7 @@ export default function Dashboard({setUser}) {
       setUnreadCounts(res.data)});
   
 
-  axios.get("http://localhost:8080/api/contacts", {
+  axios.get(`${import.meta.env.VITE_API_URL}/api/contacts`, {
     auth: {
       username: JSON.parse(localStorage.getItem("user")).gmail,
       password: localStorage.getItem("password")
@@ -156,7 +156,7 @@ export default function Dashboard({setUser}) {
     }));
 
     setContacts(formattedContacts);
-    axios.get("http://localhost:8080/api/message/last-messages", {
+    axios.get(`${import.meta.env.VITE_API_URL}/api/message/last-messages`, {
     auth: {
       username: JSON.parse(localStorage.getItem("user")).gmail,
       password: localStorage.getItem("password")
@@ -186,7 +186,7 @@ useEffect(() => {
     setLoading(true);
     // Fetch chat history
     axios
-      .get(`http://localhost:8080/api/message/${selectedContact.gmail}`, {
+      .get(`${import.meta.env.VITE_API_URL}/api/message/${selectedContact.gmail}`, {
         auth: {
           username: JSON.parse(localStorage.getItem("user")).gmail,
           password: localStorage.getItem("password") // Fixed: get password directly
@@ -207,7 +207,7 @@ useEffect(() => {
 
 const handleNewContact=async()=>{
     if (!newContactName || !newContactGmail) return;
-          const res=await axios.get("http://localhost:8080/api/exists",{
+          const res=await axios.get(`${import.meta.env.VITE_API_URL}/api/exists`,{
             params:{gmail:newContactGmail},
             auth:{
               username:JSON.parse(localStorage.getItem("user")).gmail,
@@ -243,7 +243,7 @@ const handleNewContact=async()=>{
   const handleAddMember = async () => {
     if (!memberEmail) return;
 
-    const res = await axios.get("http://localhost:8080/api/exists", {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/exists`, {
       params: { gmail: memberEmail },
       auth: { username: me, password: localStorage.getItem("password") },
     });
@@ -273,7 +273,7 @@ const handleNewContact=async()=>{
       members: [...groupMembers, me],
     };
 
-    let res=await axios.post("http://localhost:8080/api/group/create", payload, {
+    let res=await axios.post(`${import.meta.env.VITE_API_URL}/api/group/create`, payload, {
       auth: { username: me, password: localStorage.getItem("password") },
     });
 
