@@ -8,6 +8,10 @@ export default function ProfilePage({user}) {
     const[gmail,setGmail]=useState(user.gmail);
     const[url,setUrl]=useState(user.url)
    const navigate = useNavigate();
+   const user = JSON.parse(localStorage.getItem("user"));
+const password = localStorage.getItem("password");
+
+const token = btoa(`${user.gmail}:${password}`);
    console.log(user);
    const handleUpdate = async () => {
     try {
@@ -15,10 +19,9 @@ export default function ProfilePage({user}) {
         name,
         
       }, {
-        auth: {
-          username: JSON.parse(localStorage.getItem("user")).gmail,
-          password: localStorage.getItem("password"),
-        },
+        headers: {
+    Authorization: `Basic ${token}`
+  },
       });
       console.log(res.data);
       alert("Profile updated successfully!");
@@ -41,12 +44,10 @@ export default function ProfilePage({user}) {
       `${import.meta.env.VITE_API_URL}/api/profile/image`,
       formData,
       {
-        auth: {
-          username: JSON.parse(localStorage.getItem("user")).gmail,
-          password: localStorage.getItem("password"),
-        },
+        
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: `Basic ${token}`
         },
       }
     );

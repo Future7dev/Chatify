@@ -115,17 +115,15 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
     `${import.meta.env.VITE_API_URL}/api/message/read/${contact.gmail}`,
     {},
     {
-      auth: {
-        username: me,
-        password: localStorage.getItem("password")
-      }
+      headers: {
+    Authorization: `Basic ${token}`
+  }
     }
   ).then(()=>{
     axios.get(`${import.meta.env.VITE_API_URL}/api/message/unread-count`, {
-      auth: {
-        username: JSON.parse(localStorage.getItem("user")).gmail,
-        password: localStorage.getItem("password")
-      }
+       headers: {
+    Authorization: `Basic ${token}`
+  }
     }).then(res => {
       console.log("unreads:::",res.data)
       setUnreadCounts(res.data)});
@@ -140,17 +138,15 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
     `${import.meta.env.VITE_API_URL}/api/message/read/${contact.gmail}`,
     {},
     {
-      auth: {
-        username: me,
-        password: localStorage.getItem("password")
-      }
+       headers: {
+    Authorization: `Basic ${token}`
+  }
     }
   ).then(()=>{
     axios.get(`${import.meta.env.VITE_API_URL}/api/message/unread-count`, {
-      auth: {
-        username: JSON.parse(localStorage.getItem("user")).gmail,
-        password: localStorage.getItem("password")
-      }
+       headers: {
+    Authorization: `Basic ${token}`
+  }
     }).then(res => {
       console.log("unreads:::",res.data)
       setUnreadCounts(res.data)});
@@ -163,10 +159,9 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
   useEffect(()=>{
 
     axios.get(`${import.meta.env.VITE_API_URL}/api/user/online`,{
-      auth:{
-        username:JSON.parse(localStorage.getItem("user")).gmail,
-        password:localStorage.getItem("password")
-      }
+       headers: {
+    Authorization: `Basic ${token}`
+  }
     })
     .then(res=>{
       console.log("online users:",res.data)
@@ -231,10 +226,9 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
       `${import.meta.env.VITE_API_URL}/api/message/file`,
       formData,
       {
-        auth: {
-          username: JSON.parse(localStorage.getItem("user")).gmail,
-          password: localStorage.getItem("password"),
-        },
+         headers: {
+    Authorization: `Basic ${token}`
+  },
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -294,10 +288,9 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
   setLoading(true);
 
   axios.get(`${import.meta.env.VITE_API_URL}/api/group/messages/${group.id}`, {
-    auth: {
-      username: me,
-      password: localStorage.getItem("password")
-    }
+     headers: {
+    Authorization: `Basic ${token}`
+  }
   }).then(res => {
     setMessages(res.data);
   }).finally(() => {
@@ -387,10 +380,9 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
       }
 
       let res= await axios.post(`${import.meta.env.VITE_API_URL}/api/message/voice`,formData,{
-        auth:{
-          username:me,
-          password: localStorage.getItem("password")
-        },
+         headers: {
+    Authorization: `Basic ${token}`
+  },
       });
       console.log(res);
       if(!group)setMessages(prev=>[...prev,res.data]);

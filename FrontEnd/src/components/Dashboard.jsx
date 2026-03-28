@@ -14,7 +14,10 @@ import { connectWebSocket,disconnectWebSocket } from '../api/webSocket';
 export default function Dashboard({setUser}) {
   const [me, setMe] = useState(JSON.parse(localStorage.getItem("user")).gmail);
   
+  const user = JSON.parse(localStorage.getItem("user"));
+  const password = localStorage.getItem("password");
 
+  const token = btoa(`${user.gmail}:${password}`);
 
   const [selectedContact, setSelectedContact] = useState(null);
   const [lastMessages, setLastMessages] = useState({});
@@ -64,9 +67,8 @@ export default function Dashboard({setUser}) {
           if (!exist) {
             axios.get(`${import.meta.env.VITE_API_URL}/api/user`, {
               params: { gmail: newMessage.sender },
-              auth: {
-                username: JSON.parse(localStorage.getItem("user")).gmail,
-                password: localStorage.getItem("password")
+               headers: {
+                  Authorization: `Basic ${token}`
               }
             }).then(res => {
 
@@ -125,27 +127,24 @@ export default function Dashboard({setUser}) {
   
 
      axios.get(`${import.meta.env.VITE_API_URL}/api/group`, {
-    auth: {
-      username: JSON.parse(localStorage.getItem("user")).gmail,
-      password: localStorage.getItem("password")
-    }
+    headers: {
+    Authorization: `Basic ${token}`
+  }
   }).then(res => setGroups(res.data));
 
     axios.get(`${import.meta.env.VITE_API_URL}/api/message/unread-count`, {
-      auth: {
-        username: JSON.parse(localStorage.getItem("user")).gmail,
-        password: localStorage.getItem("password")
-      }
+      headers: {
+    Authorization: `Basic ${token}`
+  }
     }).then(res => {
       console.log("unreads:::",res.data)
       setUnreadCounts(res.data)});
   
 
   axios.get(`${import.meta.env.VITE_API_URL}/api/contacts`, {
-    auth: {
-      username: JSON.parse(localStorage.getItem("user")).gmail,
-      password: localStorage.getItem("password")
-    }
+     headers: {
+    Authorization: `Basic ${token}`
+  }
   })
   .then((res) => {
     const formattedContacts = res.data.map(con => ({
@@ -157,10 +156,9 @@ export default function Dashboard({setUser}) {
 
     setContacts(formattedContacts);
     axios.get(`${import.meta.env.VITE_API_URL}/api/message/last-messages`, {
-    auth: {
-      username: JSON.parse(localStorage.getItem("user")).gmail,
-      password: localStorage.getItem("password")
-    }
+     headers: {
+    Authorization: `Basic ${token}`
+  }
   })
   .then(res => {
     console.log(res.data)
@@ -187,10 +185,9 @@ useEffect(() => {
     // Fetch chat history
     axios
       .get(`${import.meta.env.VITE_API_URL}/api/message/${selectedContact.gmail}`, {
-        auth: {
-          username: JSON.parse(localStorage.getItem("user")).gmail,
-          password: localStorage.getItem("password") // Fixed: get password directly
-        }
+         headers: {
+    Authorization: `Basic ${token}`
+  }
       })
       .then(res => {
         console.log("📜 Chat history loaded:", res.data);
@@ -209,10 +206,9 @@ const handleNewContact=async()=>{
     if (!newContactName || !newContactGmail) return;
           const res=await axios.get(`${import.meta.env.VITE_API_URL}/api/exists`,{
             params:{gmail:newContactGmail},
-            auth:{
-              username:JSON.parse(localStorage.getItem("user")).gmail,
-              password:localStorage.getItem("password")
-            }
+             headers: {
+        Authorization: `Basic ${token}`
+          }
           })
           if(res.data){
             setContacts(prev => [
@@ -245,7 +241,9 @@ const handleNewContact=async()=>{
 
     const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/exists`, {
       params: { gmail: memberEmail },
-      auth: { username: me, password: localStorage.getItem("password") },
+     headers: {
+    Authorization: `Basic ${token}`
+  },
     });
 
     if (!res.data) {
@@ -274,7 +272,9 @@ const handleNewContact=async()=>{
     };
 
     let res=await axios.post(`${import.meta.env.VITE_API_URL}/api/group/create`, payload, {
-      auth: { username: me, password: localStorage.getItem("password") },
+      headers: {
+    Authorization: `Basic ${token}`
+  },
     });
 
     setGroups((prev)=>[...prev,res.data]);
