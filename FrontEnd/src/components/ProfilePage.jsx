@@ -8,10 +8,10 @@ export default function ProfilePage({user}) {
     const[gmail,setGmail]=useState(user.gmail);
     const[url,setUrl]=useState(user.url)
    const navigate = useNavigate();
-   const user = JSON.parse(localStorage.getItem("user"));
+   const authuser = JSON.parse(localStorage.getItem("user"));
 const password = localStorage.getItem("password");
 
-const token = btoa(`${user.gmail}:${password}`);
+const token = btoa(`${authuser.gmail}:${password}`);
    console.log(user);
    const handleUpdate = async () => {
     try {

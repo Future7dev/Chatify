@@ -14,10 +14,10 @@ import { connectWebSocket,disconnectWebSocket } from '../api/webSocket';
 export default function Dashboard({setUser}) {
   const [me, setMe] = useState(JSON.parse(localStorage.getItem("user")).gmail);
   
-  const user = JSON.parse(localStorage.getItem("user"));
+  const authuser = JSON.parse(localStorage.getItem("user"));
   const password = localStorage.getItem("password");
 
-  const token = btoa(`${user.gmail}:${password}`);
+  const token = btoa(`${authuser.gmail}:${password}`);
 
   const [selectedContact, setSelectedContact] = useState(null);
   const [lastMessages, setLastMessages] = useState({});
