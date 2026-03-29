@@ -15,9 +15,12 @@ export default function LoginPage({ setUser }) {
   const handleLogin = () => {
     if (!email || !password) return;
     setLoading(true);
+     const token = btoa(`${email}:${password}`);
     axios
       .get(`${import.meta.env.VITE_API_URL}/api/login`, {
-        auth: { username: email, password: password },
+       headers: {
+                  Authorization: `Basic ${token}`
+              },
       })
       .then((res) => {
         setUser(res.data);
