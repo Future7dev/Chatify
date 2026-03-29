@@ -11,6 +11,7 @@ export default function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const passwordsMatch = confirmPassword === '' ? null : password === confirmPassword;
@@ -18,14 +19,17 @@ export default function SignupPage() {
   const handleSignup = async () => {
     if (!name || !gmail || !password || !confirmPassword) return;
     if (!passwordsMatch) return;
-
+    setLoading(true);
     try {
       let response = await api.post("/signup", { name, gmail, password });
       alert(response.data);
       navigate("/login");
     } catch (e) {
       console.log(e);
+      setLoading(false);
+      alert(e.response?.data || "Signup failed");
     }
+    setLoading(false);
   };
 
   const inputStyle = {
@@ -59,6 +63,7 @@ export default function SignupPage() {
   );
 
   return (
+    <>
     <div
       className="min-vh-100 d-flex align-items-center justify-content-center logsign"
       style={{ position: 'relative', overflow: 'hidden' }}
@@ -201,5 +206,32 @@ export default function SignupPage() {
         </div>
       </div>
     </div>
+    {loading && (
+        <>
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.3)',
+              backdropFilter: 'blur(5px)',
+              zIndex: 1200,
+            }}
+          />
+          <div
+            style={{
+              position: 'fixed',
+              bottom: '300px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              borderRadius: '16px',
+              padding: '20px',
+              zIndex: 1300,
+            }}
+          >
+            <Loader />
+          </div>
+        </>
+      )}
+    </>
   );
 }
