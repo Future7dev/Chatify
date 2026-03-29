@@ -295,33 +295,37 @@ const handleNewContact=async()=>{
     <div className="vh-100 d-flex flex-column">
       <Navbar setUser={setUser} />
       <div className="flex-grow-1 d-flex overflow-hidden">
-        <ContactsSidebar
-          contacts={contacts}
-          groups={groups}                 
-          selectedContact={selectedContact}
-          selectedGroup={selectedGroup}
-          onSelectContact={setSelectedContact}
-          onSelectGroup={setSelectedGroup}
-          unreadCounts={unreadCounts}
-          lastMessages={lastMessages}
-          
-          
-          
-          
-        />
-        <UserRoundPlus 
-      onClick={() => setShowAddContact(true)}
-      className="btn btn-primary "
-      style={{
-        position: "relative",
-        top: "35rem",
-        right: "5rem",
-        width: "55px",
-        height: "55px",
-        fontSize: "28px",
-        zIndex: 1100
-      }}
-    />
+        {/* Wrap sidebar + button in a relative container */}
+        <div style={{ position: "relative" }}>
+          <ContactsSidebar
+            contacts={contacts}
+            groups={groups}
+            selectedContact={selectedContact}
+            selectedGroup={selectedGroup}
+            onSelectContact={setSelectedContact}
+            onSelectGroup={setSelectedGroup}
+            unreadCounts={unreadCounts}
+            lastMessages={lastMessages}
+          />
+          <UserRoundPlus
+            onClick={() => setShowAddContact(true)}
+            className="btn btn-primary"
+            style={{
+              position: "absolute",
+              bottom: "1.5rem",
+              right: "1rem",
+              width: "48px",
+              height: "48px",
+              fontSize: "24px",
+              zIndex: 100,
+              borderRadius: "50%",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          />
+        </div>
         <ChatArea
         contact={selectedContact}
         group={selectedGroup}
