@@ -3,6 +3,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import Orb from './Orb';
+import Loader from './Loader';
 
 export default function SignupPage() {
   const [name, setName] = useState('');
