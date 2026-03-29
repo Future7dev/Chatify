@@ -454,7 +454,7 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
   return (
     <>
     <div className="flex-grow-1 d-flex flex-column " style={{backgroundColor:'#29013c',
-      marginLeft:"-55px"}}>
+      }}>
       <div className=" border-bottom p-3 d-flex align-items-center justify-content-between"
       style={{backgroundColor:'#f5cbff'}}
       >
