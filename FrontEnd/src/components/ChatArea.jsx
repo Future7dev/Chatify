@@ -411,7 +411,7 @@ export default function ChatArea({ contact,group,onlineUsers,lastMessages,setLas
         position:'relative',
         backgroundColor:'#29013c',
         width:'78%',
-        marginLeft:'-52px'
+       
         
       }}
       >
