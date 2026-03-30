@@ -6,6 +6,8 @@
 
 **Chatify** is a full-stack real-time chat application that enables users to communicate seamlessly with secure authentication. It provides a responsive and efficient messaging experience using modern web technologies.
 
+live demo: https://chatify-nu-three.vercel.app/
+
 ---
 
 ## 🚀 Features
